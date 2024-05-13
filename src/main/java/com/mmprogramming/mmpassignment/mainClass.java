@@ -20,6 +20,9 @@ public class mainClass extends Application {
     public void start(Stage primaryStage) {
         Image backgroundImage = new Image(getClass().getResource("/Images/bgMMP.jpg").toString());
 
+        System.out.println(backgroundImage.getHeight());
+        System.out.println(backgroundImage.getWidth());
+
         // Apply GaussianBlur effect to the background image
         GaussianBlur gaussianBlur = new GaussianBlur(10); // You can adjust the radius value
         ImageView imageView = new ImageView(backgroundImage);
