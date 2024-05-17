@@ -18,7 +18,7 @@ public class mainClass extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        Image backgroundImage = new Image(getClass().getResource("/Resource_image/bgMMP.jpg").toString());
+        Image backgroundImage = new Image(getClass().getResource("/com/mmprogramming/mmpassignment/resource_image/bgMMP.jpg").toString());
 
         System.out.println(backgroundImage.getHeight());
         System.out.println(backgroundImage.getWidth());
