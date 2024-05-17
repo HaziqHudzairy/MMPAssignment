@@ -52,7 +52,7 @@ public class EditNewImage extends Application {
         DBHelper.createDatabase();
 
         // Load background image and apply Gaussian blur effect
-        Image backgroundImage = new Image(getClass().getResource("/Resource_image/bgMMP.jpg").toString());
+        Image backgroundImage = new Image(getClass().getResource("/com/mmprogramming/mmpassignment/resource_image/bgMMP.jpg").toString());
         GaussianBlur gaussianBlur = new GaussianBlur(10);
         ImageView imageView = new ImageView(backgroundImage);
         imageView.setEffect(gaussianBlur);
@@ -301,13 +301,13 @@ public class EditNewImage extends Application {
             public void handle(ActionEvent actionEvent) {
                 // Generate timestamp for saving filtered image
                 String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-                String outputPath = "src/main/resources/Images/" + imageName + "_Filtered_" + timestamp + ".jpg";
+                String outputPath = "src/main/resources/com/mmprogramming/mmpassignment/Images/" + imageName + "_Filtered_" + timestamp + ".jpg";
                 // Save filtered image
                 Imgcodecs.imwrite(outputPath, finalImage);
                 System.out.println("Filtered image saved to: " + outputPath);
 
                 // Generate path for square image
-                String outputPathSquare = "src/main/resources/square_image" + imageName + "_Filtered_square" + timestamp + ".jpg";
+                String outputPathSquare = "src/main/resources/com/mmprogramming/mmpassignment/square_image/" + imageName + "_Filtered_square" + timestamp + ".jpg";
 
                 // Process text overlay if present
                 String finalText = text.getText();
@@ -315,7 +315,7 @@ public class EditNewImage extends Application {
                     star = true;
                     System.out.println(finalText + "+");
                     // Load heart icon
-                    Mat heartIcon = Imgcodecs.imread("src/main/resources/Resource_image/heart.png", Imgcodecs.IMREAD_UNCHANGED);
+                    Mat heartIcon = Imgcodecs.imread("src/main/resources/com/mmprogramming/mmpassignment/resource_image/heart.png", Imgcodecs.IMREAD_UNCHANGED);
                     if (heartIcon.empty()) {
                         System.err.println("Cannot load heart icon!");
                         return;
