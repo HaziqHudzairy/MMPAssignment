@@ -13,11 +13,21 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class mainClass extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+
+//        Testing Database call
+//        List squareFilePath = new ArrayList<>(DBHelper.getSquarePaths());
+//        for(int i = 0; i < squareFilePath.size(); i++)
+//        {
+//            System.out.println(squareFilePath.get(i));
+//        }
+
         Image backgroundImage = new Image(getClass().getResource("/com/mmprogramming/mmpassignment/resource_image/bgMMP.jpg").toString());
 
         System.out.println(backgroundImage.getHeight());

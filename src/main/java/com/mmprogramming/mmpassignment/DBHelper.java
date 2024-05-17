@@ -1,10 +1,8 @@
 package com.mmprogramming.mmpassignment;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DBHelper {
     private static final String DB_URL = "jdbc:sqlite:ImageEditor.db";
@@ -97,6 +95,38 @@ public class DBHelper {
         } catch (SQLException e) {
             handleSQLException(e);
         }
+    }
+
+    public static List<String> getSquarePaths() {
+        List<String> squareFilePaths = new ArrayList<>();
+        String sql = "SELECT square_file_path FROM ImageData ORDER BY ID DESC";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                squareFilePaths.add(rs.getString("square_file_path"));
+            }
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+        return squareFilePaths;
+    }
+
+    public static String getImagePathClicked(String squareFilePath) {
+        String imageFilePath = null;
+        String sql = "SELECT image_file_path FROM ImageData WHERE square_file_path = ?";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, squareFilePath);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    imageFilePath = rs.getString("image_file_path");
+                }
+            }
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+        return imageFilePath;
     }
 
     private static void handleSQLException(SQLException e) {
