@@ -25,7 +25,6 @@ import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -33,12 +32,13 @@ import java.time.format.DateTimeFormatter;
 public class EditNewImage extends Application {
 
     private double cumulativeBrightnessFactor = 1.0;
-    private Stage primaryStage; // set primary stage as class level
-    private Mat currentImage; // set the current image to be clone for effect usage
+    private Stage primaryStage;
+    private Mat currentImage;
     private Mat finalImage;
     private boolean star;
+    public double image_width = 0;
 
-    private boolean grayscaleEnabled = false; // set the initial grayscale status to false
+    private boolean grayscaleEnabled = false;
     private File selectedFile;
 
     public EditNewImage(File selectedFile) {
@@ -48,55 +48,50 @@ public class EditNewImage extends Application {
     @Override
     public void start(Stage primaryStage) {
 
+        // Create the database if it doesn't exist
         DBHelper.createDatabase();
-        //BACKGROUND OF THE LAYOUT
-        // Load the image from the resources directory
-        Image backgroundImage = new Image(getClass().getResource("/Images/bgMMP.jpg").toString());
-        // Apply GaussianBlur effect to the background image
-        GaussianBlur gaussianBlur = new GaussianBlur(10); // You can adjust the radius value
+
+        // Load background image and apply Gaussian blur effect
+        Image backgroundImage = new Image(getClass().getResource("/Resource_image/bgMMP.jpg").toString());
+        GaussianBlur gaussianBlur = new GaussianBlur(10);
         ImageView imageView = new ImageView(backgroundImage);
         imageView.setEffect(gaussianBlur);
-        // Create a StackPane as the root node
         StackPane root = new StackPane();
-        // Bind the size of the ImageView to the size of the scene
         imageView.fitWidthProperty().bind(primaryStage.widthProperty());
         imageView.fitHeightProperty().bind(primaryStage.heightProperty());
-        // Add the ImageView to the root node
         root.getChildren().add(imageView);
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        // Initialize layout components
         BorderPane buttonPanel = new BorderPane();
         BorderPane imagePanel = new BorderPane();
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-        //MIDDLE BAR
+
+        // Set up middle section of the GUI
         VBox middleVB = new VBox();
         middleVB.setStyle("-fx-background-color: rgba(100, 100, 100, 0.5);");
         middleVB.setAlignment(Pos.CENTER);
         middleVB.setMinHeight(imageView.getFitHeight());
-
         imagePanel.setCenter(middleVB);
 
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+        // Set up left section of the GUI
         VBox leftVboxLayer1 = new VBox();
+        // Styling for left panel
         leftVboxLayer1.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5);");
         leftVboxLayer1.setSpacing(10);
         leftVboxLayer1.setMinWidth(130);
         leftVboxLayer1.setAlignment(Pos.TOP_CENTER);
         leftVboxLayer1.setPadding(new Insets(20, 0, 0, 0));
-
         imagePanel.setLeft(leftVboxLayer1);
 
+        // Set up bottom section of the GUI
         HBox bottomHboxLayer1 = new HBox();
         bottomHboxLayer1.setStyle("-fx-background-color: rgba(0, 0, 0, 0.8);");
         bottomHboxLayer1.setMinHeight(50);
         bottomHboxLayer1.setAlignment(Pos.CENTER);
         bottomHboxLayer1.setPadding(new Insets(0, 20, 0, 0));
         bottomHboxLayer1.setSpacing(10);
-
         imagePanel.setBottom(bottomHboxLayer1);
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-        //LEFT BAR
+        // Set up left panel for buttons
         VBox leftVbox = new VBox();
         leftVbox.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5);");
         leftVbox.setSpacing(10);
@@ -104,16 +99,16 @@ public class EditNewImage extends Application {
         leftVbox.setAlignment(Pos.TOP_CENTER);
         leftVbox.setPadding(new Insets(20, 0, 0, 0));
 
+        // Set up text] container for filter indicator
         VBox textContainer = new VBox();
         textContainer.setMinHeight(50);
         textContainer.setAlignment(Pos.CENTER);
-
         Text menuText = new Text("Filter");
         menuText.setFill(Color.WHITE);
         menuText.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-
         textContainer.getChildren().addAll(menuText);
 
+        // Buttons for image filters and actions
         Button toggleGrayscaleButton = new Button("Grayscale");
         Button increaseBrightnessButton = new Button("+ Brightness");
         Button decreaseBrightnessButton = new Button("- Brightness");
@@ -121,6 +116,7 @@ public class EditNewImage extends Application {
         Button toggleSepiaButton = new Button("Sepia");
         Button resetBtn =  new Button("Reset");
 
+        // Set preferred sizes for buttons
         toggleGrayscaleButton.setPrefSize(100, 40);
         increaseBrightnessButton.setPrefSize(100, 40);
         decreaseBrightnessButton.setPrefSize(100, 40);
@@ -128,36 +124,34 @@ public class EditNewImage extends Application {
         toggleSepiaButton.setPrefSize(100, 40);
         resetBtn.setPrefSize(100, 40);
 
-        leftVbox.getChildren().addAll(textContainer, toggleGrayscaleButton, increaseBrightnessButton,decreaseBrightnessButton,toggleGaussianBlur,toggleSepiaButton, resetBtn);
+        // Add buttons to the left panel
+        leftVbox.getChildren().addAll(textContainer, toggleGrayscaleButton, increaseBrightnessButton, decreaseBrightnessButton, toggleGaussianBlur, toggleSepiaButton, resetBtn);
         buttonPanel.setLeft(leftVbox);
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-        //RIGHT PANEL
+
+        // Set up right panel for cancel button
         VBox rightVbox = new VBox();
         rightVbox.setAlignment(Pos.TOP_RIGHT);
         rightVbox.setPadding(new Insets(20, 20, 0, 0));
         Button cancelBtn = new Button("Cancel");
+        // Event handler for cancel button
         cancelBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+                // Close the current stage and open a new instance of the main class
                 Stage stage = (Stage) cancelBtn.getScene().getWindow();
                 stage.close();
-
-                // Create an instance of mainClass and start it
                 mainClass main = new mainClass();
                 main.start(new Stage());
             }
         });
-
         rightVbox.getChildren().add(cancelBtn);
         buttonPanel.setRight(rightVbox);
 
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        // Set up additional UI elements for text overlay
         VBox middleVBLayer2 = new VBox();
         middleVBLayer2.setMinWidth(130);
         middleVBLayer2.setAlignment(Pos.BOTTOM_CENTER);
         middleVBLayer2.setPadding(new Insets(0, 0, 50, 0));
-
-        //BOTTOM BAR
         HBox bottomHbox = new HBox();
         bottomHbox.setStyle("-fx-background-color: rgba(0, 0, 0, 0.8);");
         bottomHbox.setMinHeight(50);
@@ -165,28 +159,29 @@ public class EditNewImage extends Application {
         bottomHbox.setPadding(new Insets(0, 20, 0, 0));
         bottomHbox.setSpacing(10);
 
+        // Input field for adding text overlay
         TextField insertText = new TextField();
         insertText.setMinWidth(500);
         Text text = new Text();
 
+        // Buttons for adding/removing text overlay and confirmation
         Button addTxtBtn = new Button("Add Text");
-        addTxtBtn.setOnAction(e -> {
-            // Retrieve text from the TextField
-            String inputText = insertText.getText();
+        Button removeTextBtn = new Button("Remove text");
+        Button confirmBtn = new Button("Confirm");
 
-            // Create a Text object with the input text
+        // Event handler for adding text overlay
+        addTxtBtn.setOnAction(e -> {
+            String inputText = insertText.getText();
             text.setText(inputText);
             text.setFont(Font.font("Arial", FontWeight.BOLD, 16));
             text.setFill(Color.WHITE);
-            text.setWrappingWidth(300); // Set the wrapping width to match the VBox width
+            text.setWrappingWidth(300);
             middleVBLayer2.getChildren().add(text);
             buttonPanel.setCenter(middleVBLayer2);
-            // You can adjust the position of the text as needed
-
             insertText.clear();
         });
 
-        Button removeTextBtn = new Button("Remove text");
+        // Event handler for removing text overlay
         removeTextBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -194,184 +189,264 @@ public class EditNewImage extends Application {
             }
         });
 
-
-        Button confirmBtn = new Button("Confirm");
-
+        // Add UI elements to bottom panel
         bottomHbox.getChildren().addAll(insertText, addTxtBtn, removeTextBtn, confirmBtn);
         buttonPanel.setBottom(bottomHbox);
 
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-        // Stack the black background behind the VBox
+        // Add GUI components to root stack pane
         StackPane layers = new StackPane();
         layers.getChildren().addAll(imagePanel);
-        // Add the layered layout to the root node
         root.getChildren().add(layers);
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         StackPane layer2 = new StackPane();
         layer2.getChildren().addAll(buttonPanel);
-        // Add the layered layout to the root node
         root.getChildren().add(layer2);
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-        // Create the scene with the root node
+        // Set up scene and display the stage
         Scene scene = new Scene(root);
-        // Set the scene to the stage
         primaryStage.setScene(scene);
         primaryStage.setTitle("JavaFX Background Image with Gaussian Blur and Button Panel");
         primaryStage.show();
 
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-        // Load the OpenCV native library
+        // Load OpenCV native library
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
-        // Read the image using OpenCV
+        // Read selected image file
         Mat matImage = Imgcodecs.imread(selectedFile.getAbsolutePath());
         String imageName = selectedFile.getName();
-        System.out.println("Image name: " + imageName);
 
-        updateImage(middleVB,matImage);
+        // Update displayed image
+        updateImage(middleVB, matImage);
 
+        // Store current image and create a copy for adjustments
         currentImage = matImage.clone();
         Mat brightnessImage = matImage.clone();
         finalImage = currentImage;
 
+        // Event handlers for image filter buttons
         toggleGrayscaleButton.setOnAction(e -> {
-            grayscaleEnabled = !grayscaleEnabled; // Toggle grayscale mode
-            finalImage = updateImage(middleVB, currentImage); // Update the displayed image
+            grayscaleEnabled = !grayscaleEnabled;
+            finalImage = updateImage(middleVB, currentImage);
             if (toggleGrayscaleButton.getText().equals("Grayscale")) {
                 toggleGrayscaleButton.setText("Remove Grayscale");
             } else {
                 toggleGrayscaleButton.setText("Grayscale");
             }
-
         });
 
         increaseBrightnessButton.setOnAction(e -> {
-            cumulativeBrightnessFactor += 0.2; // Increase brightness by 0.2
+            cumulativeBrightnessFactor += 0.2;
             if (cumulativeBrightnessFactor > 2.4) {
-                cumulativeBrightnessFactor = 2.4; // Cap brightness factor at 2.4
+                cumulativeBrightnessFactor = 2.4;
             }
-            currentImage = updateBrightness(middleVB, brightnessImage); // Apply brightness adjustment
+            currentImage = updateBrightness(middleVB, brightnessImage);
             finalImage = currentImage;
-
         });
 
         decreaseBrightnessButton.setOnAction(e -> {
-            cumulativeBrightnessFactor -= 0.2; // Decrease brightness by 0.2
+            cumulativeBrightnessFactor -= 0.2;
             if (cumulativeBrightnessFactor < 0.2) {
-                cumulativeBrightnessFactor = 0.2; // Cap brightness factor at 0.2
+                cumulativeBrightnessFactor = 0.2;
             }
-            currentImage = updateBrightness(middleVB, brightnessImage); // Apply brightness adjustment
+            currentImage = updateBrightness(middleVB, brightnessImage);
             finalImage = currentImage;
         });
-
-
-
-
 
         toggleGaussianBlur.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
                 if (toggleGaussianBlur.getText().equals("Blur")) {
-                     // Apply Gaussian blur
-                    Mat gaussianBlurMultiplier= applyGaussianBlur((applyGaussianBlur(currentImage, 9)),9);
-                    finalImage = updateImage(middleVB,applyGaussianBlur(gaussianBlurMultiplier,9)); // Update the displayed image
+                    Mat gaussianBlurMultiplier = applyGaussianBlur((applyGaussianBlur(currentImage, 9)), 9);
+                    finalImage = updateImage(middleVB, applyGaussianBlur(gaussianBlurMultiplier, 9));
                     toggleGaussianBlur.setText("Remove Blur");
                 } else {
-                    finalImage = updateImage(middleVB, currentImage); // Update the displayed image
+                    finalImage = updateImage(middleVB, currentImage);
                     toggleGaussianBlur.setText("Blur");
                 }
             }
-
         });
+
         toggleSepiaButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
                 if (toggleSepiaButton.getText().equals("Sepia")) {
-                    // Apply sepia effect
                     ColorAdjust sepiaEffect = new ColorAdjust();
-                    sepiaEffect.setHue(0.05); // Slight shift towards red
-                    sepiaEffect.setSaturation(0.8); // Desaturate the image
-                    sepiaEffect.setBrightness(-0.05); // Darken the image slightly
-                    sepiaEffect.setContrast(1.2); // Enhance contrast for a vintage look
-
-                    middleVB.getChildren().get(0).setEffect(sepiaEffect); // Assuming the first child is the ImageView
+                    sepiaEffect.setHue(0.05);
+                    sepiaEffect.setSaturation(0.8);
+                    sepiaEffect.setBrightness(-0.05);
+                    sepiaEffect.setContrast(1.2);
+                    middleVB.getChildren().get(0).setEffect(sepiaEffect);
                     toggleSepiaButton.setText("Remove Sepia");
                 } else {
-                    // Remove sepia effect
-                    middleVB.getChildren().get(0).setEffect(null); // Remove any effects
+                    middleVB.getChildren().get(0).setEffect(null);
                     toggleSepiaButton.setText("Sepia");
                 }
             }
-
         });
 
+        // Event handler for reset button
         resetBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                // Reset cumulative brightness factor
                 cumulativeBrightnessFactor = 1.0;
-
-                // Reset grayscale status
                 grayscaleEnabled = false;
-
-                // Reset text of grayscale button
                 toggleGrayscaleButton.setText("Grayscale");
-
-                // Reset the current image to the original image
                 currentImage = Imgcodecs.imread(selectedFile.getAbsolutePath());
-
-                // Update the displayed image
                 finalImage = updateImage(middleVB, currentImage);
-
             }
         });
 
+        // Event handler for confirm button
         confirmBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                // Generate a timestamp to ensure uniqueness
+                // Generate timestamp for saving filtered image
                 String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-                // Construct the output path with the image name, timestamp, and filter indicator
                 String outputPath = "src/main/resources/Images/" + imageName + "_Filtered_" + timestamp + ".jpg";
-                // Write the finalImage to the specified path
+                // Save filtered image
                 Imgcodecs.imwrite(outputPath, finalImage);
-                // Print a message indicating that the image has been saved
                 System.out.println("Filtered image saved to: " + outputPath);
 
-                String finalText = text.getText().toString();
-                if(finalText!=null)
-                {
+                // Generate path for square image
+                String outputPathSquare = "src/main/resources/square_image" + imageName + "_Filtered_square" + timestamp + ".jpg";
+
+                // Process text overlay if present
+                String finalText = text.getText();
+                if (!finalText.isEmpty()) {
                     star = true;
-                    System.out.println(finalText +"+");
-                }
-                else
-                {
+                    System.out.println(finalText + "+");
+                    // Load heart icon
+                    Mat heartIcon = Imgcodecs.imread("src/main/resources/Resource_image/heart.png", Imgcodecs.IMREAD_UNCHANGED);
+                    if (heartIcon.empty()) {
+                        System.err.println("Cannot load heart icon!");
+                        return;
+                    }
+                    // Add heart icon to square image
+                    int gap = 10;
+                    Mat squareImage = addHeartIcon(cropToSquare(finalImage), heartIcon, gap);
+                    Imgcodecs.imwrite(outputPathSquare, squareImage);
+                } else {
                     star = false;
-                    System.out.println(finalText +"-");
+                    System.out.println(finalText + "-");
+                    // Crop image to square
+                    Mat squareImage = cropToSquare(finalImage);
+                    Imgcodecs.imwrite(outputPathSquare, squareImage);
                 }
 
+                // Add data to database
+                DBHelper.addData(outputPath, star, finalText, outputPathSquare);
 
-                DBHelper.addData(outputPath,star,finalText);
-
+                // Close current stage and open a new instance of the main class
                 Stage stage = (Stage) confirmBtn.getScene().getWindow();
                 stage.close();
-                // Create an instance of mainClass and start it
                 mainClass main = new mainClass();
                 main.start(new Stage());
             }
         });
-
     }
 
-    private Mat updateImage(VBox middleVB, Mat matImage)
-    {
+
+    /**
+     * Crops the input image to a square shape.
+     *
+     * @param matImage The input image as a matrix.
+     * @return The cropped square image.
+     */
+    public static Mat cropToSquare(Mat matImage) {
+        // Calculate crop dimensions
+        int cropX, cropY, cropWidth, cropHeight;
+        if (matImage.width() > matImage.height()) {
+            // Landscape orientation: crop horizontally
+            cropHeight = matImage.height();
+            cropWidth = matImage.height(); // Make it a square
+            cropX = (matImage.width() - cropWidth) / 2; // Center the crop horizontally
+            cropY = 0;
+        } else {
+            // Portrait orientation or square: crop vertically
+            cropWidth = matImage.width();
+            cropHeight = matImage.width(); // Make it a square
+            cropX = 0;
+            cropY = (matImage.height() - cropHeight) / 2; // Center the crop vertically
+        }
+
+        // Crop the image
+        Rect cropRect = new Rect(cropX, cropY, cropWidth, cropHeight);
+        return new Mat(matImage, cropRect);
+    }
+
+    /**
+     * Adds a heart icon to the input image.
+     *
+     * @param matImage  The input image as a matrix.
+     * @param heartIcon The heart icon image as a matrix.
+     * @param gap       The gap between the border and the heart icon.
+     * @return The image with the heart icon added.
+     */
+    public static Mat addHeartIcon(Mat matImage, Mat heartIcon, int gap) {
+        // Ensure heart icon has an alpha channel (transparency)
+        if (heartIcon.channels() < 4) {
+            Imgproc.cvtColor(heartIcon, heartIcon, Imgproc.COLOR_BGR2BGRA);
+        }
+
+        // Resize the heart icon to fit the desired size
+        int heartWidth = heartIcon.width();
+        int heartHeight = heartIcon.height();
+        int maxWidth = matImage.width() / 5; // Adjust the size of the heart icon (20% of the image width)
+        int maxHeight = matImage.height() / 5; // Adjust the size of the heart icon (20% of the image height)
+
+        if (heartWidth > maxWidth || heartHeight > maxHeight) {
+            double aspectRatio = (double) heartWidth / heartHeight;
+            if (heartWidth > heartHeight) {
+                heartWidth = maxWidth;
+                heartHeight = (int) (maxWidth / aspectRatio);
+            } else {
+                heartHeight = maxHeight;
+                heartWidth = (int) (maxHeight * aspectRatio);
+            }
+            Size newSize = new Size(heartWidth, heartHeight);
+            Imgproc.resize(heartIcon, heartIcon, newSize);
+        }
+
+        // Position to place the heart icon
+        int xPos = matImage.width() - heartIcon.width() - gap;
+        int yPos = gap;
+
+        // Overlay the heart icon
+        for (int y = 0; y < heartIcon.height(); y++) {
+            for (int x = 0; x < heartIcon.width(); x++) {
+                double[] heartPixel = heartIcon.get(y, x);
+                double[] imagePixel = matImage.get(yPos + y, xPos + x);
+
+                if (heartPixel[3] != 0) { // Check if the pixel is not fully transparent
+                    double alpha = heartPixel[3] / 255.0;
+                    double inverseAlpha = 1.0 - alpha;
+
+                    // Blend the heart icon pixel with the image pixel
+                    double[] blendedPixel = new double[3];
+                    for (int i = 0; i < 3; i++) {
+                        blendedPixel[i] = heartPixel[i] * alpha + imagePixel[i] * inverseAlpha;
+                    }
+                    matImage.put(yPos + y, xPos + x, blendedPixel);
+                }
+            }
+        }
+
+        return matImage;
+    }
+
+    /**
+     * Updates the displayed image in the middle VBox.
+     *
+     * @param middleVB The middle VBox where the image is displayed.
+     * @param matImage The input image as a matrix.
+     * @return The resized image as a matrix.
+     */
+    private Mat updateImage(VBox middleVB, Mat matImage) {
         middleVB.getChildren().clear();
 
         if (grayscaleEnabled) {
             matImage = convertToGrayscale(matImage);
         }
+
         // Calculate the aspect ratio
         double aspectRatio = (double) matImage.width() / matImage.height();
 
@@ -385,11 +460,12 @@ public class EditNewImage extends Application {
             desiredWidth = (middleVB.getHeight() * aspectRatio);
         }
 
+        image_width = desiredWidth;
+
         // Resize the image using OpenCV
         Mat resizedMat = new Mat();
         Size newSize = new Size(desiredWidth, desiredHeight);
         Imgproc.resize(matImage, resizedMat, newSize);
-
 
         // Convert the resized Mat to a JavaFX Image
         Imgcodecs.imwrite("temp_resized_image.jpg", resizedMat);
@@ -403,6 +479,13 @@ public class EditNewImage extends Application {
         return resizedMat;
     }
 
+    /**
+     * Updates the brightness of the displayed image.
+     *
+     * @param middleVB     The middle VBox where the image is displayed.
+     * @param currentImage The current image as a matrix.
+     * @return The adjusted image as a matrix.
+     */
     private Mat updateBrightness(VBox middleVB, Mat currentImage) {
         // Adjust brightness relative to the original image
         Mat adjustedImage = adjustBrightness(currentImage.clone(), cumulativeBrightnessFactor);
@@ -410,6 +493,13 @@ public class EditNewImage extends Application {
         return adjustedImage;
     }
 
+    /**
+     * Adjusts the brightness of the input image.
+     *
+     * @param image  The input image as a matrix.
+     * @param factor The brightness adjustment factor.
+     * @return The adjusted image as a matrix.
+     */
     private Mat adjustBrightness(Mat image, double factor) {
         double alpha = cumulativeBrightnessFactor * factor;
         // Ensure alpha stays within the range of 0.1 to 2
@@ -419,12 +509,25 @@ public class EditNewImage extends Application {
         return adjustedImage;
     }
 
+    /**
+     * Converts the input image to grayscale.
+     *
+     * @param inputImage The input image as a matrix.
+     * @return The grayscale image as a matrix.
+     */
     private Mat convertToGrayscale(Mat inputImage) {
         Mat grayImage = new Mat();
         Imgproc.cvtColor(inputImage, grayImage, Imgproc.COLOR_BGR2GRAY);
         return grayImage;
     }
 
+    /**
+     * Applies Gaussian blur to the input image.
+     *
+     * @param image  The input image as a matrix.
+     * @param radius The radius of the Gaussian blur kernel.
+     * @return The blurred image as a matrix.
+     */
     private Mat applyGaussianBlur(Mat image, double radius) {
         if (radius <= 0) {
             throw new IllegalArgumentException("Invalid radius for Gaussian blur. Radius must be greater than 0.");
@@ -435,3 +538,4 @@ public class EditNewImage extends Application {
         return updatedImage;
     }
 }
+
