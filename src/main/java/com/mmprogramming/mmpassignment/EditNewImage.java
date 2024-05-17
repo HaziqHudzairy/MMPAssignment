@@ -26,6 +26,9 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -315,11 +318,28 @@ public class EditNewImage extends Application {
                     star = true;
                     System.out.println(finalText + "+");
                     // Load heart icon
-                    Mat heartIcon = Imgcodecs.imread("src/main/resources/com/mmprogramming/mmpassignment/resource_image/heart.png", Imgcodecs.IMREAD_UNCHANGED);
+//                    Mat heartIcon = Imgcodecs.imread("src/main/resources/com/mmprogramming/mmpassignment/resource_image/heart.png", Imgcodecs.IMREAD_UNCHANGED);
+                    URL resourceUrl = EditNewImage.class.getResource("/com/mmprogramming/mmpassignment/resource_image/heart.png");
+                    if (resourceUrl == null) {
+                        throw new IllegalArgumentException("Resource not found: /com/mmprogramming/mmpassignment/resource_image/heart.png");
+                    }
+
+                    // Convert URL to absolute path
+                    String absolutePath = null;
+                    try {
+                        absolutePath = Paths.get(resourceUrl.toURI()).toFile().getAbsolutePath();
+                    } catch (URISyntaxException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    // Read the image using the absolute path
+                    Mat heartIcon = Imgcodecs.imread(absolutePath, Imgcodecs.IMREAD_UNCHANGED);
+
                     if (heartIcon.empty()) {
                         System.err.println("Cannot load heart icon!");
                         return;
                     }
+
                     // Add heart icon to square image
                     int gap = 10;
                     Mat squareImage = addHeartIcon(cropToSquare(finalImage), heartIcon, gap);
