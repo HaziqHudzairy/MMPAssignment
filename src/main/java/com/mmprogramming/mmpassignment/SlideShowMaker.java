@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.mmprogramming.mmpassignment;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
