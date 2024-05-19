@@ -436,7 +436,7 @@ public class EditNewImage extends Application {
                 double[] heartPixel = heartIcon.get(y, x);
                 double[] imagePixel = matImage.get(yPos + y, xPos + x);
 
-                if (heartPixel[3] != 0) { // Check if the pixel is not fully transparent
+                if (heartPixel.length == 4 && heartPixel[3] != 0) { // Check if the pixel is not fully transparent
                     double alpha = heartPixel[3] / 255.0;
                     double inverseAlpha = 1.0 - alpha;
 
@@ -452,6 +452,7 @@ public class EditNewImage extends Application {
 
         return matImage;
     }
+
 
     /**
      * Updates the displayed image in the middle VBox.
