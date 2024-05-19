@@ -112,6 +112,23 @@ public class DBHelper {
         return squareFilePaths;
     }
 
+    public static int getImageID(String squareFilePath){
+        int imageID = 0;
+        String sql = "SELECT ID FROM ImageData WHERE square_file_path = ?";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setString(1, squareFilePath);
+            try (ResultSet rs = pstmt.executeQuery()){
+                while(rs.next()){
+                    imageID = rs.getInt(1);
+                }
+            }
+        } catch (SQLException e){
+            handleSQLException(e);
+        }
+        return imageID;
+    }
+
     public static String getImagePathClicked(String squareFilePath) {
         String imageFilePath = null;
         String sql = "SELECT image_file_path FROM ImageData WHERE square_file_path = ?";

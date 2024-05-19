@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -25,9 +26,15 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class mainClass extends Application {
+
+    private final Set<ImageView> selectedImages = new HashSet<>();
+    private boolean isSelectMode = false;
 
     @Override
     public void start(Stage primaryStage) {
@@ -91,18 +98,44 @@ public class mainClass extends Application {
         button_row.setAlignment(Pos.TOP_RIGHT);
         button_row.setSpacing(10);
 
-        upload_button.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                uploadImage(primaryStage); // Pass primaryStage object
-            }
-        });
-
         FlowPane photo_grid = new FlowPane();
         photo_grid.setHgap(20);
         photo_grid.setVgap(20);
 
         displayImages(photo_grid);
+
+        // Event handlers for buttons
+        select_button.setOnAction(event -> {
+            if (isSelectMode) {
+                // Exit select mode
+                isSelectMode = false;
+                select_button.setText("Select");
+                upload_button.setText("Upload");
+                clearSelection(photo_grid);
+            } else {
+                // Enter select mode
+                isSelectMode = true;
+                select_button.setText("Cancel");
+                upload_button.setText("Make Slideshow");
+            }
+        });
+
+        upload_button.setOnAction(event -> {
+            if (isSelectMode) {
+                // Create slideshow
+                List<Integer> selectedImageIds = new ArrayList<>();
+                for (ImageView imageView : selectedImages) {
+                    String path = imageView.getImage().getUrl();
+                    System.out.println(path);
+                    int id = DBHelper.getImageID(path);
+                    selectedImageIds.add(id);
+                }
+                createSlideshow(selectedImageIds);
+            } else {
+                // Normal upload functionality
+                uploadImage(primaryStage);
+            }
+        });
 
         vBox.getChildren().addAll(title, button_row, photo_grid);
         return root;
@@ -162,13 +195,45 @@ public class mainClass extends Application {
 
             // Set click event handler
             imageView.setOnMouseClicked(event -> {
-                // Navigate to another class or scene
-                handleImageClick(path);
+                if (isSelectMode) {
+                    if (selectedImages.contains(imageView)) {
+                        selectedImages.remove(imageView);
+                        imageView.setStyle(""); // Remove highlight
+                    } else {
+                        selectedImages.add(imageView);
+                        imageView.setStyle("-fx-effect: innershadow(three-pass-box, green, 20, 0.5, 0, 0);"); // Highlight
+                    }
+                } else {
+                    handleImageClick(path);
+                }
+            });
+
+            ColorAdjust hoverEffect = new ColorAdjust();
+            hoverEffect.setBrightness(0.14);
+
+            imageView.setOnMouseEntered(e -> {
+                if (!isSelectMode) imageView.setEffect(hoverEffect);
+            });
+            imageView.setOnMouseExited(e -> {
+                if (!isSelectMode) imageView.setEffect(null);
             });
 
             // Add ImageView to FlowPane
             photo_grid.getChildren().add(imageView);
         }
+    }
+
+    private void clearSelection(FlowPane photoGrid) {
+        for (ImageView imageView : selectedImages) {
+            imageView.setStyle(""); // Remove highlight
+        }
+        selectedImages.clear();
+    }
+
+    private void createSlideshow(List<Integer> selectedImageIds) {
+        // Logic to create slideshow with selected image IDs
+        System.out.println("Creating slideshow with IDs: " + selectedImageIds);
+        // Implement slideshow creation logic here
     }
 
     public static void main(String[] args) {
