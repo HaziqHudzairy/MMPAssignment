@@ -274,7 +274,7 @@ public class SlideShowMaker extends Application {
         });
     }
 
-//    WORK IN PROGRESS
+    //    WORK IN PROGRESS
     private void addGraphics() {
         Dialog<String> dialog = new Dialog<>();
         dialog.setTitle("Select a Graphic");
