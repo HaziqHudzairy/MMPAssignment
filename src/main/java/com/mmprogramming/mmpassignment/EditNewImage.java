@@ -361,7 +361,8 @@ public class EditNewImage extends Application {
 
                     // Add heart icon to square image
                     int gap = 10;
-                    Mat squareImage = addHeartIcon(cropToSquare(finalImage), heartIcon, gap);
+                    Mat squareImage = cropToSquare(finalImage);
+//                    Mat squareImage = addHeartIcon(cropToSquare(finalImage), heartIcon, gap); comment temporary
                     Imgcodecs.imwrite(outputPathSquare, squareImage);
                 } else {
                     star = false;

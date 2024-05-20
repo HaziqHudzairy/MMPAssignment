@@ -26,10 +26,7 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class mainClass extends Application {
 
@@ -202,6 +199,17 @@ public class mainClass extends Application {
                 imagePath = Paths.get(path).toUri().toString();
             }
 
+            // Create StackPane
+            StackPane imageStack = new StackPane();
+            String heartPath = mainClass.class.getResource("/com/mmprogramming/mmpassignment/resource_image/heart.png").toString();
+
+            Image heartIcon = new Image(heartPath);
+            ImageView heartOverlay = new ImageView(heartIcon);
+            heartOverlay.setFitHeight(40);
+            heartOverlay.setFitWidth(40);
+            heartOverlay.setTranslateX(70);
+            heartOverlay.setTranslateY(-70);
+
             // Create Image and ImageView
             Image image = new Image(imagePath);
             ImageView imageView = new ImageView(image);
@@ -240,8 +248,9 @@ public class mainClass extends Application {
                 if (!isSelectMode) imageView.setEffect(null);
             });
 
+            imageStack.getChildren().addAll(imageView, heartOverlay);
             // Add ImageView to FlowPane
-            photo_grid.getChildren().add(imageView);
+            photo_grid.getChildren().add(imageStack);
         }
     }
 
