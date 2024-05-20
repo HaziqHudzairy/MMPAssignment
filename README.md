@@ -24,7 +24,24 @@ As a user, you will not have to worry about security as no personal data is shar
 # Members and Tasks Assignment
 
 ## MUHAMMAD DZAKY ABDURRASYID
-  -
+  - Developed the main layout of the slideshow, ensuring a clean and user-friendly interface.
+  - Implemented the VBox and HBox layout structures to organize the components neatly.
+  - Configured ImageView and Label properties, such as size, alignment, and style, for optimal display.
+
+  ## Key Features Developed
+  # Image and Caption Management
+  
+   - Image Loading: Created loadImagesFromFolder method to dynamically load images from the database, allowing for easy updates and additions to the slideshow content.
+   - Caption Loading and Saving: Implemented methods loadCaptionsFromFile and saveCaptionsToFile to handle reading and writing captions to a text file, facilitating easy editing and persistence of image captions.
+
+  # User Interaction and Controls
+
+   - Play and Pause Functionality: Added play and pause buttons with actions that control a Timeline for automatic slideshow progression and a MediaPlayer for background music.
+   - Sound File Selection: Implemented file chooser functionality in chooseSoundFile button to allow users to select and play custom sound files, enhancing the multimedia experience.
+   - Image Selection Dialog: Developed showImageSelectionDialog method to provide users with a dialog interface for selecting specific images in the slideshow, improving user control.
+ 
+  # Transition and Animation
+   - Smooth Image Transitions: Integrated FadeTransition in the updateImage method to create smooth transitions between images, enhancing the visual appeal of the slideshow.
 
 ## MUHAMAD FIRDAUS BIN YAMAT
   -
