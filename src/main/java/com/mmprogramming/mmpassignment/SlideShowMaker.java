@@ -59,8 +59,6 @@ public class SlideShowMaker extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-
-
         VBox root = new VBox();
 
         imageView = new ImageView();
@@ -251,11 +249,6 @@ public class SlideShowMaker extends Application {
             System.out.println("Selected graphic: " + result);
         });
     }
-
-
-
-
-
 
     private void showTextInputDialog() {
         Dialog<String> dialog = new Dialog<>();

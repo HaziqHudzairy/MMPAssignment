@@ -13,7 +13,13 @@
 4. Build and run the mainClass.
 
 # Project Description
+Memoria is your personal photo album where you can safely express yourself. With Memoria, you can upload personal
+photos, put on filters, and write captions so that the memories will forever live on. Memoria also allows you to create
+a slideshow from selected images. Be creative with your personal slideshow as you can play your favourite songs, add
+visual effects, and write meaningful texts.
 
+To keep your privacy safe, Memoria creates a database in your own machine, and stores your personal photos locally.
+As a user, you will not have to worry about security as no personal data is shared online or with any third-party app.
 
 # Members and Tasks Assignment
 
