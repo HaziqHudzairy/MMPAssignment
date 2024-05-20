@@ -35,7 +35,7 @@
   - Build the logic to dynamically navigate to each image.
 
 # Description of Functions and Outputs
-	| Syntax | Description |
+| Syntax | Description |
 | ----------- | ----------- |
 | Header | Title |
 | Paragraph | Text |
