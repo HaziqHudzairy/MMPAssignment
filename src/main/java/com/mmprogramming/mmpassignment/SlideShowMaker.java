@@ -24,11 +24,10 @@ import javafx.util.Duration;
 
 import javax.imageio.stream.FileImageInputStream;
 import java.awt.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class SlideShowMaker extends Application {
     private int currentIndex = 0;
@@ -41,6 +40,12 @@ public class SlideShowMaker extends Application {
     private final List<String> imagePaths = new ArrayList<>();
     // List to store image texts
     private final List<String> imageTexts = new ArrayList<>();
+    private final String captionFilePath = "captions.txt";
+
+
+    public SlideShowMaker(List<Image> selectedImage) {
+
+    }
 
 
     //    // List of image URLs or paths
@@ -66,6 +71,7 @@ public class SlideShowMaker extends Application {
         // Folder path containing images
         String folderPath = "src/main/resources/com/mmprogramming/mmpassignment/square_image";
         loadImagesFromFolder(folderPath);
+        loadCaptionsFromFile(captionFilePath);
 
 
         VBox root = new VBox();
@@ -162,8 +168,36 @@ public class SlideShowMaker extends Application {
         if (files != null) {
             for (File file : files) {
                 imagePaths.add(file.getAbsolutePath());
-                imageTexts.add("Text for " + file.getName()); // You can customize this part to add specific text for each image
+                // text edit for the captions
+                imageTexts.add("");            }
+        }
+    }
+
+    // Method to load captions from a text file
+    private void loadCaptionsFromFile(String filePath) {
+        try (Scanner scanner = new Scanner(new File(filePath))) {
+            int i = 0;
+            while (scanner.hasNextLine()) {
+                if (i < imageTexts.size()) {
+                    imageTexts.set(i, scanner.nextLine());
+                } else {
+                    imageTexts.add(scanner.nextLine());
+                }
+                i++;
             }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Method to save captions to a text file
+    private void saveCaptionsToFile(String filePath) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(filePath))) {
+            for (String text : imageTexts) {
+                writer.println(text);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -221,8 +255,8 @@ public class SlideShowMaker extends Application {
             grid.add(radioButton, 0, i);
         }
 
-        if (imagePaths.size() > 0) {
-            ((RadioButton) toggleGroup.getToggles().get(0)).setSelected(true);
+        if (!imagePaths.isEmpty()) {
+            ((RadioButton) toggleGroup.getToggles().getFirst()).setSelected(true);
         }
 
         dialog.getDialogPane().setContent(grid);
@@ -287,10 +321,6 @@ public class SlideShowMaker extends Application {
     }
 
 
-
-
-
-
     private void showTextInputDialog() {
         Dialog<String> dialog = new Dialog<>();
         dialog.setTitle("Edit Slide Text");
@@ -324,8 +354,9 @@ public class SlideShowMaker extends Application {
         });
 
         dialog.showAndWait().ifPresent(result -> {
-            imageTexts.set(currentIndex,result);
-            textLabel.setText(result); //Update label
+            imageTexts.set(currentIndex, result);
+            textLabel.setText(result); // Update label
+            saveCaptionsToFile(captionFilePath); // Save the updated captions to the file
         });
     }
 
