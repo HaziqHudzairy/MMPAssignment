@@ -153,81 +153,124 @@ public static void removeData(int id) {
         e.printStackTrace();
     }
 
-    //    /**
-//     * Edits an existing record in the ImageData table.
-//     * @param id the ID of the record to be updated
-//     * @param imageFilePath the new path to the image file
-//     * @param star the new star flag for the image
-//     * @param text the new text associated with the image
-//     * @param text_color the new color of the text
-//     * @param squareFilePath the new path to the square image file
-//     */
-//    public static void editData(int id, String imageFilePath, boolean star, String text, String text_color, String squareFilePath) {
-//        String sql = "UPDATE ImageData SET image_file_path = ?, star = ?, text = ?, text_color = ?, square_file_path = ? WHERE ID = ?";
-//        try (Connection conn = DriverManager.getConnection(DB_URL);
-//             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-//            pstmt.setString(1, imageFilePath);
-//            pstmt.setBoolean(2, star);
-//            pstmt.setString(3, text);
-//            pstmt.setString(4, text_color);
-//            pstmt.setString(5, squareFilePath);
-//            pstmt.setInt(6, id);
-//            int rowsUpdated = pstmt.executeUpdate();
-//            if (rowsUpdated > 0) {
-//                System.out.println("Record updated successfully");
-//            } else {
-//                System.out.println("No records found with the given ID");
-//            }
-//        } catch (SQLException e) {
-//            handleSQLException(e);
-//        }
-//    }
+    /**
+     * Edits the text and text color of an existing record in the ImageData table.
+     * @param id the ID of the record to be updated
+     * @param text the new text associated with the image
+     * @param text_color the new color of the text
+     */
+    public static void editTextAndColor(int id, String text, String text_color) {
+        String sql = "UPDATE ImageData SET text = ?, text_color = ? WHERE ID = ?";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, text);
+            pstmt.setString(2, text_color);
+            pstmt.setInt(3, id);
+            int rowsUpdated = pstmt.executeUpdate();
+            if (rowsUpdated > 0) {
+                System.out.println("Record updated successfully");
+            } else {
+                System.out.println("No records found with the given ID");
+            }
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+    }
 
-    //    /**
-//     * Retrieves the image file path of the image record by square file path.
-//     * @param squareFilePath the square file path
-//     * @return the image file path of the image record
-//     */
-//    public static String getImagePathClicked(String squareFilePath) {
-//        String imageFilePath = null;
-//        String sql = "SELECT image_file_path FROM ImageData WHERE square_file_path = ?";
-//        try (Connection conn = DriverManager.getConnection(DB_URL);
-//             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-//            pstmt.setString(1, squareFilePath);
-//            try (ResultSet rs = pstmt.executeQuery()) {
-//                if (rs.next()) {
-//                    imageFilePath = rs.getString("image_file_path");
-//                }
-//            }
-//        } catch (SQLException e) {
-//            handleSQLException(e);
-//        }
-//        return imageFilePath;
-//    }
+    /**
+     * Retrieves the text and text color of the image record by ID.
+     * @param ID the ID
+     * @return the ID of the image record
+     */
+    public static String getText(int ID) {
+        String text = null;
+        String sql = "SELECT text FROM ImageData WHERE ID = ?";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, ID); // Set the ID parameter as an int
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    // Retrieve the values from the result set
+                    text = rs.getString("text");
+                } else {
+                    System.out.println("No record found for the given ID: " + ID);
+                }
+            }
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+        // Return the retrieved text
+        return text;
+    }
 
-    //    /**
-//     * Retrieves the ID of the image record by square file path.
-//     * @param squareFilePath the square file path
-//     * @return the ID of the image record
-//     */
-//    public static int getImageID(String squareFilePath){
-//        int imageID = 0;
-//        String sql = "SELECT ID FROM ImageData WHERE square_file_path = ?";
-//        try (Connection conn = DriverManager.getConnection(DB_URL);
-//             PreparedStatement pstmt = conn.prepareStatement(sql)){
-//            pstmt.setString(1, squareFilePath);
-//            System.out.println("Executing Query with Path: " + squareFilePath);
-//            try (ResultSet rs = pstmt.executeQuery()){
-//                if(rs.next()){
-//                    imageID = rs.getInt(1);
-//                } else {
-//                    System.out.println("No ID found for the given path: " + squareFilePath);
-//                }
-//            }
-//        } catch (SQLException e){
-//            handleSQLException(e);
-//        }
-//        return imageID;
-//    }
+    public static String getTextColor(int ID) {
+        String textColor = null;
+        String sql = "SELECT text_color FROM ImageData WHERE ID = ?";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, ID); // Set the ID parameter as an int
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    // Retrieve the values from the result set
+                    textColor = rs.getString("text_color");
+                } else {
+                    System.out.println("No record found for the given ID: " + ID);
+                }
+            }
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+        // Return the retrieved text
+        return textColor;
+    }
+
+
+    /**
+     * Retrieves the ID of the image record by square file path.
+     * @param squareFilePath the square file path
+     * @return the ID of the image record
+     */
+    public static int getImageID(String squareFilePath){
+        int imageID = 0;
+        String sql = "SELECT ID FROM ImageData WHERE square_file_path = ?";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setString(1, squareFilePath);
+            try (ResultSet rs = pstmt.executeQuery()){
+                if(rs.next()){
+                    imageID = rs.getInt(1);
+                } else {
+                    System.out.println("No ID found for the given path: " + squareFilePath);
+                }
+            }
+        } catch (SQLException e){
+            handleSQLException(e);
+        }
+        return imageID;
+    }
+
+    /**
+     * Retrieves the image file path of the image record by ID.
+     * @param id the ID of the image record
+     * @return the image file path
+     */
+    public static String getImageFilePath(int id) {
+        String imageFilePath = null;
+        String sql = "SELECT image_file_path FROM ImageData WHERE ID = ?";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    imageFilePath = rs.getString("image_file_path");
+                } else {
+                    System.out.println("No image file path found for the given ID: " + id);
+                }
+            }
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+        return imageFilePath;
+    }
 }
 

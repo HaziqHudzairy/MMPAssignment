@@ -490,8 +490,6 @@ public class EditNewImage extends Application {
             desiredWidth = (middleVB.getHeight() * aspectRatio);
         }
 
-        image_width = desiredWidth;
-
         // Resize the image using OpenCV
         Mat resizedMat = new Mat();
         Size newSize = new Size(desiredWidth, desiredHeight);

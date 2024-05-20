@@ -4,6 +4,7 @@ module com.mmprogramming.mmpassignment {
     requires java.sql;
     requires opencv;
     requires javafx.media;
+    requires java.desktop;
 
 
     opens com.mmprogramming.mmpassignment to javafx.fxml;

@@ -30,6 +30,7 @@ import java.util.*;
 
 public class mainClass extends Application {
 
+
     private final Set<ImageView> selectedImages = new HashSet<>();
     private boolean isSelectMode = false;
 
@@ -112,7 +113,7 @@ public class mainClass extends Application {
         photo_grid.setVgap(20);
 
         // Display all photos in the FlowPane
-        displayImages(photo_grid);
+        displayImages(photo_grid, primaryStage);
 
         // Toggle mode when Select button is clicked
         select_button.setOnAction(event -> {
@@ -183,12 +184,25 @@ public class mainClass extends Application {
         }
     }
 
-    private void handleImageClick(String imagePath) {
-        System.out.println("Image clicked: " + imagePath);
-        // Implement navigation logic here
+    // Inside the handleImageClick method of mainClass
+    // Inside the handleImageClick method of mainClass
+    private void handleImageClick(String imagePath, Stage primaryStage) {
+
+        // Close the current primaryStage
+        primaryStage.close();
+
+        // Instantiate the ViewImage class and pass necessary parameters
+        ImageViewer viewImage = new ImageViewer(DBHelper.getImageID(imagePath)); // Assuming imagePath is the necessary parameter
+
+        // Create a new stage for ViewImage
+        Stage viewImageStage = new Stage();
+
+        // Call the start method of ViewImage, passing the new stage
+        viewImage.start(viewImageStage);
     }
 
-    private void displayImages(FlowPane photo_grid){
+
+    private void displayImages(FlowPane photo_grid, Stage primaryStage){
         // Get image paths from database
         List<String> imagePaths = DBHelper.getSquarePaths();
 
@@ -239,7 +253,7 @@ public class mainClass extends Application {
                     }
                 } else {
                     // Navigate to the photo's page when Select button is not active
-                    handleImageClick(path);
+                    handleImageClick(path, primaryStage);
                 }
             });
 
