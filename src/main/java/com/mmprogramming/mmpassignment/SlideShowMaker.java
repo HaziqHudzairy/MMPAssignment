@@ -8,6 +8,10 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -18,6 +22,8 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 
+import javax.imageio.stream.FileImageInputStream;
+import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -26,33 +32,50 @@ import java.util.List;
 
 public class SlideShowMaker extends Application {
     private int currentIndex = 0;
+    private Label textLabel;
     private ImageView imageView;
     private MediaPlayer mediaPlayer;
-    private List<Image> imageList;
-    private List<ImageView> graphicsList = new ArrayList<>();
-    private Label textLabel;
+    private List<ImageView> graphicsList = new ArrayList<>(); // List to store graphic elements
 
-    private String[] imageTexts = {
-            "Text for Image 1",
-            "Text for Image 2",
-            "Text for Image 3"
-    };
+    // List to store image paths
+    private final List<String> imagePaths = new ArrayList<>();
+    // List to store image texts
+    private final List<String> imageTexts = new ArrayList<>();
 
 
-    public SlideShowMaker(List<Image> imageList) {
-        this.imageList = imageList;
-    }
+    //    // List of image URLs or paths
+//    private final String[] imagePaths = {
+//            "C:\\Users\\Firdaus\\Downloads\\ex_1.jpg",
+//            "C:\\Users\\Firdaus\\Downloads\\ex_2.jpg",
+//            "C:\\Users\\Firdaus\\Downloads\\ex_3.jpg"
+//    };
+//
+//    //Adding the text to the slide show/images
+//    private final String[] imageTexts = {
+//            "Text for Image 1",
+//            "Text for Image 2",
+//            "Text for Image 3"
+//    };
+
+
 
     @Override
     public void start(Stage primaryStage) {
+
+        // Load images from the folder
+        // Folder path containing images
+        String folderPath = "src/main/resources/com/mmprogramming/mmpassignment/square_image";
+        loadImagesFromFolder(folderPath);
+
+
         VBox root = new VBox();
 
         imageView = new ImageView();
-        imageView.setFitHeight(500);
-        imageView.setFitWidth(500);
+        imageView.setFitHeight(400);
+        imageView.setFitWidth(600);
 
-//        imageView.fitWidthProperty().bind(primaryStage.widthProperty());
-//        imageView.fitHeightProperty().bind(primaryStage.heightProperty().subtract(80));
+        imageView.fitWidthProperty().bind(primaryStage.widthProperty());
+//        imageView.fitHeightProperty().bind(primaryStage.heightProperty().subtract(100));
 
         VBox.setVgrow(imageView, Priority.ALWAYS);
 
@@ -62,34 +85,29 @@ public class SlideShowMaker extends Application {
 
         textLabel = new Label();
         textLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: black;");
-        VBox.setVgrow(textLabel, Priority.ALWAYS);
+        textLabel.setPadding(new Insets(10));
+        VBox.setVgrow(textLabel, Priority.NEVER);
 
         HBox buttonBar = new HBox(10);
         buttonBar.setAlignment(Pos.CENTER);
         buttonBar.setPadding(new Insets(20));
 
-        Button backButton = new Button("Back");
         Button playButton = new Button("Play Video");
         Button pauseButton = new Button("Pause");
         Button chooseSoundFile = new Button("Choose Sound File");
         Button addGraphics = new Button("Add Graphics");
+        Button chooseImage = new Button("Choose Image");
         Button addText = new Button("Add Text");
 
-        buttonBar.getChildren().addAll(backButton, playButton, pauseButton, chooseSoundFile, addText, addGraphics);
+        buttonBar.getChildren().addAll(playButton, pauseButton, chooseSoundFile, chooseImage, addText, addGraphics);
 
         updateImage();
 
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), event -> {
-            currentIndex = (currentIndex + 1) % imageList.size();
+            currentIndex = (currentIndex + 1) % imagePaths.size();
             updateImage();
         }));
         timeline.setCycleCount(Timeline.INDEFINITE);
-
-        addText.setOnAction(actionEvent -> showTextInputDialog());
-
-        addGraphics.setOnAction(actionEvent -> {
-            addGraphics();
-        });
 
         chooseSoundFile.setOnAction(actionEvent -> {
             FileChooser fileChooser = new FileChooser();
@@ -115,18 +133,20 @@ public class SlideShowMaker extends Application {
         pauseButton.setOnAction(actionEvent -> {
             timeline.pause();
             if(mediaPlayer != null) {
-                mediaPlayer.play();
+                mediaPlayer.pause();
             }
         });
 
-        backButton.setOnAction(actionEvent -> {
-            Stage stage = (Stage) backButton.getScene().getWindow();
-            stage.close();
-            mainClass main = new mainClass();
-            main.start(new Stage());
-        });
+        //add chooseImage button
+        chooseImage.setOnAction(actionEvent -> {showImageSelectionDialog();});
 
-        root.getChildren().addAll(textLabel, imageView, buttonBar);
+        //add addText button
+        addText.setOnAction(actionEvent -> showTextInputDialog());
+
+        //add addGraphics
+        addGraphics.setOnAction(actionEvent -> addGraphics());
+
+        root.getChildren().addAll(imageView, textLabel, buttonBar);
         Scene scene = new Scene(root, 800, 600);
 
         // Set up the stage
@@ -135,53 +155,88 @@ public class SlideShowMaker extends Application {
         primaryStage.show();
     }
 
+    // Method to load images from a specified folder
+    private void loadImagesFromFolder(String folderPath) {
+        File folder = new File(folderPath);
+        File[] files = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".jpg") || name.toLowerCase().endsWith(".png"));
+        if (files != null) {
+            for (File file : files) {
+                imagePaths.add(file.getAbsolutePath());
+                imageTexts.add("Text for " + file.getName()); // You can customize this part to add specific text for each image
+            }
+        }
+    }
+
     // Method to update the image in the ImageView
-    private void updateImage()  {
+//    private void updateImage()  {
+//        FadeTransition ft = new FadeTransition(Duration.seconds(1), imageView);
+//        ft.setFromValue(0);
+//        ft.setToValue(1);
+//        ft.play();
+//        try {
+//            Image image = new Image(new FileInputStream(imagePaths[currentIndex]));
+//            imageView.setImage(image);
+//            textLabel.setText(imageTexts[currentIndex]); // update the image text
+//
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//    }
+
+    // Method to update the image in the ImageView
+    private void updateImage() {
         FadeTransition ft = new FadeTransition(Duration.seconds(1), imageView);
         ft.setFromValue(0);
         ft.setToValue(1);
         ft.play();
-        Image image = imageList.get(currentIndex);
-        imageView.setImage(image);
-
+        try {
+            Image image = new Image(new FileInputStream(imagePaths.get(currentIndex)));
+            imageView.setImage(image);
+            textLabel.setText(imageTexts.get(currentIndex)); // update the image text
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
+    // Method to show image selection dialog
+    private void showImageSelectionDialog() {
 
-    private void showTextInputDialog() {
-        Dialog<String> dialog = new Dialog<>();
-        dialog.setTitle("Edit Slide Text");
-        dialog.setHeaderText("Enter text for the current slide:");
+        Dialog<Integer> dialog = new Dialog<>();
+        dialog.setTitle("Select an Image");
 
-        // Set the button types.
         ButtonType confirmButtonType = new ButtonType("Confirm", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
 
-        // Create the text field and set it with the current slide text.
-        TextField textField = new TextField();
-        textField.setText(imageTexts[currentIndex]);
-
-        // Layout for the dialog.
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setPadding(new Insets(20, 150, 10, 10));
 
-        grid.add(new Label("Text:"), 0, 0);
-        grid.add(textField, 1, 0);
+        ToggleGroup toggleGroup = new ToggleGroup();
+
+        for (int i = 0; i < imagePaths.size(); i++) {
+            RadioButton radioButton = new RadioButton("Image " + (i + 1));
+            radioButton.setToggleGroup(toggleGroup);
+            radioButton.setUserData(i);
+            grid.add(radioButton, 0, i);
+        }
+
+        if (imagePaths.size() > 0) {
+            ((RadioButton) toggleGroup.getToggles().get(0)).setSelected(true);
+        }
 
         dialog.getDialogPane().setContent(grid);
 
-        // Convert the result to the text input when the confirm button is clicked.
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == confirmButtonType) {
-                return textField.getText();
+                return (Integer) toggleGroup.getSelectedToggle().getUserData();
             }
             return null;
         });
 
         dialog.showAndWait().ifPresent(result -> {
-            imageTexts[currentIndex] = result;
-            textLabel.setText(result); //Update label
+            currentIndex = result;
+            updateImage();
         });
     }
 
@@ -231,5 +286,51 @@ public class SlideShowMaker extends Application {
         });
     }
 
+
+
+
+
+
+    private void showTextInputDialog() {
+        Dialog<String> dialog = new Dialog<>();
+        dialog.setTitle("Edit Slide Text");
+        dialog.setHeaderText("Enter text for the current slide:");
+
+        // Set the button types.
+        ButtonType confirmButtonType = new ButtonType("Confirm", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
+
+        // Create the text field and set it with the current slide text.
+        TextField textField = new TextField();
+        textField.setText(imageTexts.get(currentIndex));
+
+        // Layout for the dialog.
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        grid.add(new Label("Text:"), 0, 0);
+        grid.add(textField, 1, 0);
+
+        dialog.getDialogPane().setContent(grid);
+
+        // Convert the result to the text input when the confirm button is clicked.
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == confirmButtonType) {
+                return textField.getText();
+            }
+            return null;
+        });
+
+        dialog.showAndWait().ifPresent(result -> {
+            imageTexts.set(currentIndex,result);
+            textLabel.setText(result); //Update label
+        });
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
 }
 
