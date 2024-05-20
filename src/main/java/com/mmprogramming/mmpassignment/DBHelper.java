@@ -135,6 +135,24 @@ public class DBHelper {
         return imageID;
     }
 
+    public static boolean getStarValue(String squareFilePath) {
+        boolean starValue = false;
+        String sql = "SELECT star FROM ImageData WHERE square_file_path = ?";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, squareFilePath);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    starValue = rs.getBoolean("star");
+                }
+            }
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+        return starValue;
+    }
+
+
 
     public static String getImagePathClicked(String squareFilePath) {
         String imageFilePath = null;

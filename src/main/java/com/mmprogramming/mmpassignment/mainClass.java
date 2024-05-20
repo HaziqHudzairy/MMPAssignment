@@ -56,8 +56,8 @@ public class mainClass extends Application {
     private StackPane layout(Stage primaryStage){
         // Put a background image for the home page
         Image backgroundImage = new Image(getClass().getResource("/com/mmprogramming/mmpassignment/resource_image/bgMMP.jpg").toString());
-        System.out.println(backgroundImage.getHeight());
-        System.out.println(backgroundImage.getWidth());
+//        System.out.println(backgroundImage.getHeight());
+//        System.out.println(backgroundImage.getWidth());
 
         // Apply GaussianBlur effect to the background image
         GaussianBlur gaussianBlur = new GaussianBlur(10); // You can adjust the radius value
@@ -195,9 +195,18 @@ public class mainClass extends Application {
         // Loop through all the image paths from the database
         for (String path : imagePaths) {
             String imagePath = path;
+            String pathing = path;
             if (!path.startsWith("http") && !path.startsWith("file:/")) {
                 imagePath = Paths.get(path).toUri().toString();
             }
+
+            // Ensure the path starts from "src"
+            int srcIndex = pathing.indexOf("src");
+            if (srcIndex != -1) {
+                pathing = pathing.substring(srcIndex);
+            }
+
+            boolean star = DBHelper.getStarValue(pathing);
 
             // Create StackPane
             StackPane imageStack = new StackPane();
@@ -248,6 +257,8 @@ public class mainClass extends Application {
                 if (!isSelectMode) imageView.setEffect(null);
             });
 
+            // Set visibility based on the star value
+            heartOverlay.setVisible(star);
             imageStack.getChildren().addAll(imageView, heartOverlay);
             // Add ImageView to FlowPane
             photo_grid.getChildren().add(imageStack);

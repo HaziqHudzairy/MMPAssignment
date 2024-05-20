@@ -322,54 +322,24 @@ public class EditNewImage extends Application {
                 String outputPath = "src/main/resources/com/mmprogramming/mmpassignment/Images/" + imageName + "_Filtered_" + timestamp + ".jpg";
                 // Save filtered image
                 Imgcodecs.imwrite(outputPath, finalImage);
-                System.out.println("Filtered image saved to: " + outputPath);
+//                System.out.println("Filtered image saved to: " + outputPath);
 
                 // Generate path for square image
                 String outputPathSquare = "src/main/resources/com/mmprogramming/mmpassignment/square_image/" + imageName + "_Filtered_square" + timestamp + ".jpg";
 
                 // Store text color
                 String text_color = getColorString(textColorContainer);
-                System.out.println(text_color);
+//                System.out.println(text_color);
+
+                Mat squareImage = cropToSquare(finalImage);
+                Imgcodecs.imwrite(outputPathSquare, squareImage);
 
                 // Process text overlay if present
                 String finalText = text.getText();
                 if (!finalText.isEmpty()) {
                     star = true;
-                    System.out.println(finalText + "+");
-                    // Load heart icon
-//                    Mat heartIcon = Imgcodecs.imread("src/main/resources/com/mmprogramming/mmpassignment/resource_image/heart.png", Imgcodecs.IMREAD_UNCHANGED);
-                    URL resourceUrl = EditNewImage.class.getResource("/com/mmprogramming/mmpassignment/resource_image/heart.png");
-                    if (resourceUrl == null) {
-                        throw new IllegalArgumentException("Resource not found: /com/mmprogramming/mmpassignment/resource_image/heart.png");
-                    }
-
-                    // Convert URL to absolute path
-                    String absolutePath = null;
-                    try {
-                        absolutePath = Paths.get(resourceUrl.toURI()).toFile().getAbsolutePath();
-                    } catch (URISyntaxException e) {
-                        throw new RuntimeException(e);
-                    }
-
-                    // Read the image using the absolute path
-                    Mat heartIcon = Imgcodecs.imread(absolutePath, Imgcodecs.IMREAD_UNCHANGED);
-
-                    if (heartIcon.empty()) {
-                        System.err.println("Cannot load heart icon!");
-                        return;
-                    }
-
-                    // Add heart icon to square image
-                    int gap = 10;
-                    Mat squareImage = cropToSquare(finalImage);
-//                    Mat squareImage = addHeartIcon(cropToSquare(finalImage), heartIcon, gap); comment temporary
-                    Imgcodecs.imwrite(outputPathSquare, squareImage);
                 } else {
                     star = false;
-                    System.out.println(finalText + "-");
-                    // Crop image to square
-                    Mat squareImage = cropToSquare(finalImage);
-                    Imgcodecs.imwrite(outputPathSquare, squareImage);
                 }
 
                 // Add data to database
