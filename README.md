@@ -16,12 +16,23 @@
 
 
 # Members and Tasks Assignment
-- MUHAMMAD DZAKY ABDURRASYID -
-- MUHAMAD FIRDAUS BIN YAMAT -
-- MUHAMMAD HAZIQ FARHAN BIN ARDHI -
-- MUHAMMAD HAZIQ HUDZAIRY BIN HUSSIN -
-- UMAR MUZAKKI BIN ZULKIFLI - Design and develop the home page that displays all the uploaded images. Create a function
-to send selected videos to the slideshow creation.
+
+- MUHAMMAD DZAKY ABDURRASYID
+  -
+
+- MUHAMAD FIRDAUS BIN YAMAT
+  -
+
+- MUHAMMAD HAZIQ FARHAN BIN ARDHI
+  -
+
+- MUHAMMAD HAZIQ HUDZAIRY BIN HUSSIN
+  -
+
+- UMAR MUZAKKI BIN ZULKIFLI
+  - Design and develop the Home page that displays all the uploaded photos.
+  - Develop the method to send selected photos to the slideshow creation.
+  - Build the logic to dynamically navigate to each image.
 
 # Description of Functions and Outputs
 
