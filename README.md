@@ -30,7 +30,68 @@ As a user, you will not have to worry about security as no personal data is shar
   -
 
 ## MUHAMMAD HAZIQ FARHAN BIN ARDHI
-  -
+- Develop an imageviewer page
+- View the uploaded image with a larger scale
+- Add caption in the photos
+- Create save button to save caption into database and display the caption
+
+### <u> *Class: ImageViewer* </u>
+
+### Fields:
+
+*imageView*: An ImageView object for displaying images.
+
+*root*: A BorderPane object to hold the layout components.
+
+*captionDisplayBox*: A VBox for displaying captions.
+
+*DATABASE_URL*: A constant string representing the URL for the database.
+
+### Methods:
+
+*start(Stage primaryStage)*: Initializes the GUI components and displays the image viewer interface.
+
+*addCaption(ActionEvent event)*: Event handler method to add a caption to the image.
+
+*saveCaptionToDatabase(String caption)*: Saves the caption to the database.
+
+*displayCaptionsFromDatabase()*: Fetches and displays captions from the database.
+
+*styleButton(Button button)*: Sets the preferred width and height for buttons.
+
+*main(String[] args)*: Main method to launch the application.
+
+### Other Components:
+
+*`Button captionButton`*: Button to add a caption.
+
+*Button backButton*: Button to exit.
+
+*HBox buttonBox*: Holds the captionButton.
+
+*HBox backButtonBox*: Holds the backButton.
+
+*StackPane imagePane*: Centers the image.
+
+*Scene scene*: The scene to be displayed on the stage.
+
+### Database Handling:
+
+The application interacts with a SQLite database to store and retrieve captions associated with images.
+
+### User Interface:
+
+The interface consists of an image displayed in the center, with options to add captions and exit.
+
+Captions are displayed at the bottom of the interface.
+
+### Functionality:
+
+Users can add captions to the displayed image, which are then saved to the database.
+
+Captions stored in the database are fetched and displayed in the UI.
+
+  
 
 ---
 ## MUHAMMAD HAZIQ HUDZAIRY BIN HUSSIN
