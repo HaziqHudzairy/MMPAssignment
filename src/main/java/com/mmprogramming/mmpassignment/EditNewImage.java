@@ -118,7 +118,6 @@ public class EditNewImage extends Application {
         Button increaseBrightnessButton = new Button("+ Brightness");
         Button decreaseBrightnessButton = new Button("- Brightness");
         Button toggleGaussianBlur = new Button("Blur");
-        Button toggleSepiaButton = new Button("Sepia");
         Button resetBtn =  new Button("Reset");
 
         // Set preferred sizes for buttons

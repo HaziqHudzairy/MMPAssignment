@@ -39,6 +39,8 @@ public class mainClass extends Application {
     @Override
     public void start(Stage primaryStage) {
 
+        DBHelper.createDatabase();
+
 //        Testing Database call
 //        List squareFilePath = new ArrayList<>(DBHelper.getSquarePaths());
 //        for(int i = 0; i < squareFilePath.size(); i++)
