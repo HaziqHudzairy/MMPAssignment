@@ -22,8 +22,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 
-import javax.imageio.stream.FileImageInputStream;
-import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,32 +33,16 @@ public class SlideShowMaker extends Application {
     private ImageView imageView;
     private MediaPlayer mediaPlayer;
     private List<ImageView> graphicsList = new ArrayList<>(); // List to store graphic elements
+    private List<Image> imageList;
 
-    // List to store image paths
-    private final List<String> imagePaths = new ArrayList<>();
     // List to store image texts
     private final List<String> imageTexts = new ArrayList<>();
     private final String captionFilePath = "captions.txt";
 
 
-    public SlideShowMaker(List<Image> selectedImage) {
-
+    public SlideShowMaker(List<Image> imageList) {
+        this.imageList = imageList;
     }
-
-
-    //    // List of image URLs or paths
-//    private final String[] imagePaths = {
-//            "C:\\Users\\Firdaus\\Downloads\\ex_1.jpg",
-//            "C:\\Users\\Firdaus\\Downloads\\ex_2.jpg",
-//            "C:\\Users\\Firdaus\\Downloads\\ex_3.jpg"
-//    };
-//
-//    //Adding the text to the slide show/images
-//    private final String[] imageTexts = {
-//            "Text for Image 1",
-//            "Text for Image 2",
-//            "Text for Image 3"
-//    };
 
 
 
@@ -70,7 +52,6 @@ public class SlideShowMaker extends Application {
         // Load images from the folder
         // Folder path containing images
         String folderPath = "src/main/resources/com/mmprogramming/mmpassignment/square_image";
-        loadImagesFromFolder(folderPath);
         loadCaptionsFromFile(captionFilePath);
 
 
@@ -102,15 +83,14 @@ public class SlideShowMaker extends Application {
         Button pauseButton = new Button("Pause");
         Button chooseSoundFile = new Button("Choose Sound File");
         Button addGraphics = new Button("Add Graphics");
-        Button chooseImage = new Button("Choose Image");
         Button addText = new Button("Add Text");
 
-        buttonBar.getChildren().addAll(playButton, pauseButton, chooseSoundFile, chooseImage, addText, addGraphics);
+        buttonBar.getChildren().addAll(playButton, pauseButton, chooseSoundFile, addText, addGraphics);
 
         updateImage();
 
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), event -> {
-            currentIndex = (currentIndex + 1) % imagePaths.size();
+            currentIndex = (currentIndex + 1) % imageList.size();
             updateImage();
         }));
         timeline.setCycleCount(Timeline.INDEFINITE);
@@ -143,8 +123,6 @@ public class SlideShowMaker extends Application {
             }
         });
 
-        //add chooseImage button
-        chooseImage.setOnAction(actionEvent -> {showImageSelectionDialog();});
 
         //add addText button
         addText.setOnAction(actionEvent -> showTextInputDialog());
@@ -161,17 +139,6 @@ public class SlideShowMaker extends Application {
         primaryStage.show();
     }
 
-    // Method to load images from a specified folder
-    private void loadImagesFromFolder(String folderPath) {
-        File folder = new File(folderPath);
-        File[] files = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".jpg") || name.toLowerCase().endsWith(".png"));
-        if (files != null) {
-            for (File file : files) {
-                imagePaths.add(file.getAbsolutePath());
-                // text edit for the captions
-                imageTexts.add("");            }
-        }
-    }
 
     // Method to load captions from a text file
     private void loadCaptionsFromFile(String filePath) {
@@ -202,79 +169,16 @@ public class SlideShowMaker extends Application {
     }
 
     // Method to update the image in the ImageView
-//    private void updateImage()  {
-//        FadeTransition ft = new FadeTransition(Duration.seconds(1), imageView);
-//        ft.setFromValue(0);
-//        ft.setToValue(1);
-//        ft.play();
-//        try {
-//            Image image = new Image(new FileInputStream(imagePaths[currentIndex]));
-//            imageView.setImage(image);
-//            textLabel.setText(imageTexts[currentIndex]); // update the image text
-//
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
-    // Method to update the image in the ImageView
     private void updateImage() {
         FadeTransition ft = new FadeTransition(Duration.seconds(1), imageView);
         ft.setFromValue(0);
         ft.setToValue(1);
         ft.play();
-        try {
-            Image image = new Image(new FileInputStream(imagePaths.get(currentIndex)));
+            Image image = imageList.get(currentIndex);
             imageView.setImage(image);
             textLabel.setText(imageTexts.get(currentIndex)); // update the image text
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
     }
 
-    // Method to show image selection dialog
-    private void showImageSelectionDialog() {
-
-        Dialog<Integer> dialog = new Dialog<>();
-        dialog.setTitle("Select an Image");
-
-        ButtonType confirmButtonType = new ButtonType("Confirm", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
-
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
-
-        ToggleGroup toggleGroup = new ToggleGroup();
-
-        for (int i = 0; i < imagePaths.size(); i++) {
-            RadioButton radioButton = new RadioButton("Image " + (i + 1));
-            radioButton.setToggleGroup(toggleGroup);
-            radioButton.setUserData(i);
-            grid.add(radioButton, 0, i);
-        }
-
-        if (!imagePaths.isEmpty()) {
-            ((RadioButton) toggleGroup.getToggles().getFirst()).setSelected(true);
-        }
-
-        dialog.getDialogPane().setContent(grid);
-
-        dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == confirmButtonType) {
-                return (Integer) toggleGroup.getSelectedToggle().getUserData();
-            }
-            return null;
-        });
-
-        dialog.showAndWait().ifPresent(result -> {
-            currentIndex = result;
-            updateImage();
-        });
-    }
-
-    //    WORK IN PROGRESS
     private void addGraphics() {
         Dialog<String> dialog = new Dialog<>();
         dialog.setTitle("Select a Graphic");
@@ -329,7 +233,6 @@ public class SlideShowMaker extends Application {
         });
 
         dialog.showAndWait().ifPresent(result -> {
-
             System.out.println("Selected graphic: " + result);
         });
     }
