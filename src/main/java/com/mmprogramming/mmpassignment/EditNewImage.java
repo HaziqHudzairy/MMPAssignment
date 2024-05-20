@@ -40,6 +40,8 @@ public class EditNewImage extends Application {
     private Mat finalImage;
     private boolean star;
     public double image_width = 0;
+    public  int currentColorIndex = 0;
+    public Color textColorContainer = Color.WHITE;
 
     private boolean grayscaleEnabled = false;
     private File selectedFile;
@@ -124,11 +126,10 @@ public class EditNewImage extends Application {
         increaseBrightnessButton.setPrefSize(100, 40);
         decreaseBrightnessButton.setPrefSize(100, 40);
         toggleGaussianBlur.setPrefSize(100, 40);
-        toggleSepiaButton.setPrefSize(100, 40);
         resetBtn.setPrefSize(100, 40);
 
         // Add buttons to the left panel
-        leftVbox.getChildren().addAll(textContainer, toggleGrayscaleButton, increaseBrightnessButton, decreaseBrightnessButton, toggleGaussianBlur, toggleSepiaButton, resetBtn);
+        leftVbox.getChildren().addAll(textContainer, toggleGrayscaleButton, increaseBrightnessButton, decreaseBrightnessButton, toggleGaussianBlur, resetBtn);
         buttonPanel.setLeft(leftVbox);
 
         // Set up right panel for cancel button
@@ -169,19 +170,35 @@ public class EditNewImage extends Application {
 
         // Buttons for adding/removing text overlay and confirmation
         Button addTxtBtn = new Button("Add Text");
+        Button changeColor = new Button("Change color");
         Button removeTextBtn = new Button("Remove text");
         Button confirmBtn = new Button("Confirm");
+
+        // Define an array of colors to rotate through
+        Color[] textColors = {Color.WHITE, Color.BLACK, Color.RED, Color.BLUE, Color.GREEN};
+
 
         // Event handler for adding text overlay
         addTxtBtn.setOnAction(e -> {
             String inputText = insertText.getText();
             text.setText(inputText);
             text.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-            text.setFill(Color.WHITE);
+            text.setFill(textColors[0]);
             text.setWrappingWidth(300);
             middleVBLayer2.getChildren().add(text);
             buttonPanel.setCenter(middleVBLayer2);
             insertText.clear();
+        });
+
+        // Event handler for text color
+        changeColor.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                Color nextColor = textColors[currentColorIndex];
+                textColorContainer = textColors[currentColorIndex];
+                text.setFill(nextColor);
+                currentColorIndex = (currentColorIndex + 1) % textColors.length;
+            }
         });
 
         // Event handler for removing text overlay
@@ -193,7 +210,7 @@ public class EditNewImage extends Application {
         });
 
         // Add UI elements to bottom panel
-        bottomHbox.getChildren().addAll(insertText, addTxtBtn, removeTextBtn, confirmBtn);
+        bottomHbox.getChildren().addAll(insertText, addTxtBtn, changeColor, removeTextBtn, confirmBtn);
         buttonPanel.setBottom(bottomHbox);
 
         // Add GUI components to root stack pane
@@ -207,7 +224,7 @@ public class EditNewImage extends Application {
         // Set up scene and display the stage
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("JavaFX Background Image with Gaussian Blur and Button Panel");
+        primaryStage.setTitle("Edit image");
         primaryStage.show();
 
         // Load OpenCV native library
@@ -268,23 +285,23 @@ public class EditNewImage extends Application {
             }
         });
 
-        toggleSepiaButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                if (toggleSepiaButton.getText().equals("Sepia")) {
-                    ColorAdjust sepiaEffect = new ColorAdjust();
-                    sepiaEffect.setHue(0.05);
-                    sepiaEffect.setSaturation(0.8);
-                    sepiaEffect.setBrightness(-0.05);
-                    sepiaEffect.setContrast(1.2);
-                    middleVB.getChildren().get(0).setEffect(sepiaEffect);
-                    toggleSepiaButton.setText("Remove Sepia");
-                } else {
-                    middleVB.getChildren().get(0).setEffect(null);
-                    toggleSepiaButton.setText("Sepia");
-                }
-            }
-        });
+//        toggleSepiaButton.setOnAction(new EventHandler<ActionEvent>() {
+//            @Override
+//            public void handle(ActionEvent actionEvent) {
+//                if (toggleSepiaButton.getText().equals("Sepia")) {
+//                    ColorAdjust sepiaEffect = new ColorAdjust();
+//                    sepiaEffect.setHue(0.05);
+//                    sepiaEffect.setSaturation(0.8);
+//                    sepiaEffect.setBrightness(-0.05);
+//                    sepiaEffect.setContrast(1.2);
+//                    middleVB.getChildren().get(0).setEffect(sepiaEffect);
+//                    toggleSepiaButton.setText("Remove Sepia");
+//                } else {
+//                    middleVB.getChildren().get(0).setEffect(null);
+//                    toggleSepiaButton.setText("Sepia");
+//                }
+//            }
+//        });
 
         // Event handler for reset button
         resetBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -311,6 +328,10 @@ public class EditNewImage extends Application {
 
                 // Generate path for square image
                 String outputPathSquare = "src/main/resources/com/mmprogramming/mmpassignment/square_image/" + imageName + "_Filtered_square" + timestamp + ".jpg";
+
+                // Store text color
+                String text_color = getColorString(textColorContainer);
+                System.out.println(text_color);
 
                 // Process text overlay if present
                 String finalText = text.getText();
@@ -353,7 +374,7 @@ public class EditNewImage extends Application {
                 }
 
                 // Add data to database
-                DBHelper.addData(outputPath, star, finalText, outputPathSquare);
+                DBHelper.addData(outputPath, star, finalText, text_color, outputPathSquare);
 
                 // Close current stage and open a new instance of the main class
                 Stage stage = (Stage) confirmBtn.getScene().getWindow();
@@ -362,6 +383,25 @@ public class EditNewImage extends Application {
                 main.start(new Stage());
             }
         });
+    }
+
+    // Method to convert a Color object to a string representation in the form of Color.COLOR_NAME
+    private static String getColorString(Color color) {
+        // Check predefined colors
+        if (color.equals(Color.WHITE)) {
+            return "Color.WHITE";
+        } else if (color.equals(Color.BLACK)) {
+            return "Color.BLACK";
+        } else if (color.equals(Color.RED)) {
+            return "Color.RED";
+        } else if (color.equals(Color.BLUE)) {
+            return "Color.BLUE";
+        } else if (color.equals(Color.GREEN)) {
+            return "Color.GREEN";
+        }
+
+        // For custom colors, return hexadecimal representation
+        return color.toString();
     }
 
 

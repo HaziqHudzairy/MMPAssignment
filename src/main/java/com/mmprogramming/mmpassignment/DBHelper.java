@@ -37,6 +37,7 @@ public class DBHelper {
                 + "image_file_path TEXT,\n"
                 + "star BOOLEAN,\n"
                 + "text TEXT,\n"
+                + "text_color TEXT,\n"
                 + "square_file_path TEXT\n"
                 + ")";
         try (Statement stmt = conn.createStatement()) {
@@ -46,14 +47,15 @@ public class DBHelper {
         }
     }
 
-    public static void addData(String imageFilePath, boolean star, String text, String squareFilePath) {
-        String sql = "INSERT INTO ImageData (image_file_path, star, text, square_file_path) VALUES (?, ?, ?, ?)";
+    public static void addData(String imageFilePath, boolean star, String text, String text_color, String squareFilePath) {
+        String sql = "INSERT INTO ImageData (image_file_path, star, text, text_color, square_file_path) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, imageFilePath);
             pstmt.setBoolean(2, star);
             pstmt.setString(3, text);
-            pstmt.setString(4, squareFilePath);
+            pstmt.setString(4, text_color);
+            pstmt.setString(5, squareFilePath);
             pstmt.executeUpdate();
             System.out.println("Recorded in database");
         } catch (SQLException e) {
@@ -77,15 +79,16 @@ public class DBHelper {
         }
     }
 
-    public static void editData(int id, String imageFilePath, boolean star, String text, String squareFilePath) {
-        String sql = "UPDATE ImageData SET image_file_path = ?, star = ?, text = ?, square_file_path = ? WHERE ID = ?";
+    public static void editData(int id, String imageFilePath, boolean star, String text, String text_color, String squareFilePath) {
+        String sql = "UPDATE ImageData SET image_file_path = ?, star = ?, text = ?, text_color = ?, square_file_path = ? WHERE ID = ?";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, imageFilePath);
             pstmt.setBoolean(2, star);
             pstmt.setString(3, text);
-            pstmt.setString(4, squareFilePath);
-            pstmt.setInt(5, id);
+            pstmt.setString(4, text_color);
+            pstmt.setString(5, squareFilePath);
+            pstmt.setInt(6, id);
             int rowsUpdated = pstmt.executeUpdate();
             if (rowsUpdated > 0) {
                 System.out.println("Record updated successfully");
