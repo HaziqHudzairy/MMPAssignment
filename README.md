@@ -30,7 +30,8 @@ As a user, you will not have to worry about security as no personal data is shar
 
 ## MUHAMAD FIRDAUS BIN YAMAT
   - Develop the graphic effects adding into the slideshow.
-  - Create functions to allow caption adding during the slideshow. 
+  - Create functions to allow caption adding during the slideshow.
+  - Configure the ImageView and edit the caption and apply the graphic on the selected ImageView.
 
 ## MUHAMMAD HAZIQ FARHAN BIN ARDHI
   - Develop an imageviewer page
