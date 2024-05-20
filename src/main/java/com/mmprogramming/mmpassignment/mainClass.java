@@ -46,6 +46,7 @@ public class mainClass extends Application {
 //            System.out.println(squareFilePath.get(i));
 //        }
 
+        // Set up the stage
         Scene scene = new Scene(layout(primaryStage));
         primaryStage.setScene(scene);
         primaryStage.setTitle("My Photos");
@@ -54,6 +55,7 @@ public class mainClass extends Application {
     }
 
     private StackPane layout(Stage primaryStage){
+        // Put a background image for the home page
         Image backgroundImage = new Image(getClass().getResource("/com/mmprogramming/mmpassignment/resource_image/bgMMP.jpg").toString());
         System.out.println(backgroundImage.getHeight());
         System.out.println(backgroundImage.getWidth());
@@ -63,14 +65,23 @@ public class mainClass extends Application {
         ImageView bgView = new ImageView(backgroundImage);
         bgView.setEffect(gaussianBlur);
 
+        // Bind the size of the background image to the size of the scene
+        bgView.fitWidthProperty().bind(primaryStage.widthProperty());
+        bgView.fitHeightProperty().bind(primaryStage.heightProperty());
+
         // Create a StackPane as the root node
         StackPane root = new StackPane();
+
+        // Create a ScrollPane and VBox
         ScrollPane sp = new ScrollPane();
         VBox vBox = new VBox();
+
+        // Set the property of VBox
         vBox.setPrefWidth(960);
         vBox.setPrefHeight(540);
         vBox.setPadding(new Insets(20, 20, 20, 20));
 
+        // Set the property of ScrollPane with VBox as its content
         sp.setContent(vBox);
         sp.setPrefWidth(960);
         sp.setPrefHeight(540);
@@ -78,18 +89,16 @@ public class mainClass extends Application {
         sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         sp.setStyle("-fx-background:transparent;-fx-background-color:transparent;");
 
-        // Bind the size of the ImageView to the size of the scene
-        bgView.fitWidthProperty().bind(primaryStage.widthProperty());
-        bgView.fitHeightProperty().bind(primaryStage.heightProperty());
-
-        // Add the ImageView to the root node
+        // Add background image, and ScrollPane to the root node
         root.getChildren().addAll(bgView, sp);
 
+        // Set the title of the page
         Text title = new Text("My Photos");
         title.setFont(new Font("Segoe UI Variable", 48));
         title.setFont(Font.font(null, FontWeight.BOLD, 80));
         title.setStyle("-fx-stroke: black; -fx-stroke-width: 1; -fx-fill: white");
 
+        // Create a HBox to contain 2 side-by-side buttons
         HBox button_row = new HBox();
         button_row.setPadding(new Insets(0, 20, 10, 0));
         Button select_button = new Button("Select");
@@ -98,46 +107,59 @@ public class mainClass extends Application {
         button_row.setAlignment(Pos.TOP_RIGHT);
         button_row.setSpacing(10);
 
+        // Create a FlowPane to contain all the uploaded photos
         FlowPane photo_grid = new FlowPane();
         photo_grid.setHgap(20);
         photo_grid.setVgap(20);
 
+        // Display all photos in the FlowPane
         displayImages(photo_grid);
 
-        // Event handlers for buttons
+        // Toggle mode when Select button is clicked
         select_button.setOnAction(event -> {
             if (isSelectMode) {
-                // Exit select mode
+                // Exit Select mode
                 isSelectMode = false;
                 select_button.setText("Select");
                 upload_button.setText("Upload");
                 clearSelection(photo_grid);
             } else {
-                // Enter select mode
+                // Enter Select mode to create a slideshow
                 isSelectMode = true;
                 select_button.setText("Cancel");
-                upload_button.setText("Make Slideshow");
+                upload_button.setText("Create a slideshow");
             }
         });
 
+        // Upload button functionality in both toggle mode
         upload_button.setOnAction(event -> {
             if (isSelectMode) {
-                // Create slideshow
+                // Create a slideshow
                 List<Integer> selectedImageIds = new ArrayList<>();
                 for (ImageView imageView : selectedImages) {
-                    String path = imageView.getImage().getUrl();
-                    System.out.println(path);
+                    String prepath = imageView.getImage().getUrl();
+
+                    // Format the path to be exactly the same as in the database
+                    String prepath1 = prepath.replace("/", "\\");
+                    String prepath2 = prepath1.replace("%20"," ");
+                    String path = prepath2.replaceFirst("file:\\\\", "");
+
+                    // Get ID of selected image
                     int id = DBHelper.getImageID(path);
+
+                    // Add ID to a list
                     selectedImageIds.add(id);
                 }
                 createSlideshow(selectedImageIds);
             } else {
-                // Normal upload functionality
+                // Upload an image
                 uploadImage(primaryStage);
             }
         });
 
+        // Add title, HBox, and FlowPane as child of the VBox.
         vBox.getChildren().addAll(title, button_row, photo_grid);
+
         return root;
     }
 
@@ -181,39 +203,47 @@ public class mainClass extends Application {
         // Get image paths from database
         List<String> imagePaths = DBHelper.getSquarePaths();
 
+        // Loop through all the image paths from the database
         for (String path : imagePaths) {
             String imagePath = path;
             if (!path.startsWith("http") && !path.startsWith("file:/")) {
                 imagePath = Paths.get(path).toUri().toString();
             }
+
             // Create Image and ImageView
             Image image = new Image(imagePath);
             ImageView imageView = new ImageView(image);
-            imageView.setFitWidth(210); // Adjust as needed
-            imageView.setFitHeight(210); // Adjust as needed
+            imageView.setFitWidth(210);
+            imageView.setFitHeight(210);
             imageView.setPreserveRatio(true);
 
-            // Set click event handler
+            // Set image click event handler
             imageView.setOnMouseClicked(event -> {
                 if (isSelectMode) {
+                    // Events when Select button is active
                     if (selectedImages.contains(imageView)) {
                         selectedImages.remove(imageView);
-                        imageView.setStyle(""); // Remove highlight
+                        imageView.setStyle(""); // Remove highlight from photo
                     } else {
                         selectedImages.add(imageView);
-                        imageView.setStyle("-fx-effect: innershadow(three-pass-box, green, 20, 0.5, 0, 0);"); // Highlight
+                        imageView.setStyle("-fx-effect: innershadow(three-pass-box, green, 20, 0.5, 0, 0);"); // Highlight the photo
                     }
                 } else {
+                    // Navigate to the photo's page when Select button is not active
                     handleImageClick(path);
                 }
             });
 
+            // Create ColorAdjust for image hover effect
             ColorAdjust hoverEffect = new ColorAdjust();
             hoverEffect.setBrightness(0.14);
 
+            // Increase brightness of photo when mouse is hovering over it
             imageView.setOnMouseEntered(e -> {
                 if (!isSelectMode) imageView.setEffect(hoverEffect);
             });
+
+            // Return to normal when mouse is no longer hovering over it
             imageView.setOnMouseExited(e -> {
                 if (!isSelectMode) imageView.setEffect(null);
             });
