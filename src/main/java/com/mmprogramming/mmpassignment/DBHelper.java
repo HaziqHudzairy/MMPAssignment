@@ -121,9 +121,12 @@ public class DBHelper {
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)){
             pstmt.setString(1, squareFilePath);
+            System.out.println("Executing Query with Path: " + squareFilePath);
             try (ResultSet rs = pstmt.executeQuery()){
-                while(rs.next()){
+                if(rs.next()){
                     imageID = rs.getInt(1);
+                } else {
+                    System.out.println("No ID found for the given path: " + squareFilePath);
                 }
             }
         } catch (SQLException e){
@@ -131,6 +134,7 @@ public class DBHelper {
         }
         return imageID;
     }
+
 
     public static String getImagePathClicked(String squareFilePath) {
         String imageFilePath = null;

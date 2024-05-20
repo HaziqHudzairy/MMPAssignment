@@ -139,19 +139,29 @@ public class mainClass extends Application {
                 // Create a slideshow
                 List<Integer> selectedImageIds = new ArrayList<>();
                 for (ImageView imageView : selectedImages) {
-                    String prepath = imageView.getImage().getUrl();
+                    String path = imageView.getImage().getUrl();
 
-                    // Format the path to be exactly the same as in the database
-                    String prepath1 = prepath.replace("/", "\\");
-                    String prepath2 = prepath1.replace("%20"," ");
-                    String path = prepath2.replaceFirst("file:\\\\", "");
+                    // start at src
+                    int srcIndex = path.indexOf("src");
+                    if (srcIndex != -1) {
+                        path = path.substring(srcIndex);
+                    }
+
+                    // Normalize path to use forward slashes
+                    path = path.replace("\\", "/");
+
+                    System.out.println("Generated Path: " + path);
 
                     // Get ID of selected image
                     int id = DBHelper.getImageID(path);
 
+                    System.out.println("Retrieved ID: " + id);
+
                     // Add ID to a list
                     selectedImageIds.add(id);
                 }
+
+
                 createSlideshow(selectedImageIds);
             } else {
                 // Upload an image
