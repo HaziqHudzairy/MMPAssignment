@@ -402,65 +402,65 @@ public class EditNewImage extends Application {
         return new Mat(matImage, cropRect);
     }
 
-    /**
-     * Adds a heart icon to the input image.
-     *
-     * @param matImage  The input image as a matrix.
-     * @param heartIcon The heart icon image as a matrix.
-     * @param gap       The gap between the border and the heart icon.
-     * @return The image with the heart icon added.
-     */
-    public static Mat addHeartIcon(Mat matImage, Mat heartIcon, int gap) {
-        // Ensure heart icon has an alpha channel (transparency)
-        if (heartIcon.channels() < 4) {
-            Imgproc.cvtColor(heartIcon, heartIcon, Imgproc.COLOR_BGR2BGRA);
-        }
-
-        // Resize the heart icon to fit the desired size
-        int heartWidth = heartIcon.width();
-        int heartHeight = heartIcon.height();
-        int maxWidth = matImage.width() / 5; // Adjust the size of the heart icon (20% of the image width)
-        int maxHeight = matImage.height() / 5; // Adjust the size of the heart icon (20% of the image height)
-
-        if (heartWidth > maxWidth || heartHeight > maxHeight) {
-            double aspectRatio = (double) heartWidth / heartHeight;
-            if (heartWidth > heartHeight) {
-                heartWidth = maxWidth;
-                heartHeight = (int) (maxWidth / aspectRatio);
-            } else {
-                heartHeight = maxHeight;
-                heartWidth = (int) (maxHeight * aspectRatio);
-            }
-            Size newSize = new Size(heartWidth, heartHeight);
-            Imgproc.resize(heartIcon, heartIcon, newSize);
-        }
-
-        // Position to place the heart icon
-        int xPos = matImage.width() - heartIcon.width() - gap;
-        int yPos = gap;
-
-        // Overlay the heart icon
-        for (int y = 0; y < heartIcon.height(); y++) {
-            for (int x = 0; x < heartIcon.width(); x++) {
-                double[] heartPixel = heartIcon.get(y, x);
-                double[] imagePixel = matImage.get(yPos + y, xPos + x);
-
-                if (heartPixel.length == 4 && heartPixel[3] != 0) { // Check if the pixel is not fully transparent
-                    double alpha = heartPixel[3] / 255.0;
-                    double inverseAlpha = 1.0 - alpha;
-
-                    // Blend the heart icon pixel with the image pixel
-                    double[] blendedPixel = new double[3];
-                    for (int i = 0; i < 3; i++) {
-                        blendedPixel[i] = heartPixel[i] * alpha + imagePixel[i] * inverseAlpha;
-                    }
-                    matImage.put(yPos + y, xPos + x, blendedPixel);
-                }
-            }
-        }
-
-        return matImage;
-    }
+//    /**
+//     * Adds a heart icon to the input image.
+//     *
+//     * @param matImage  The input image as a matrix.
+//     * @param heartIcon The heart icon image as a matrix.
+//     * @param gap       The gap between the border and the heart icon.
+//     * @return The image with the heart icon added.
+//     */
+//    public static Mat addHeartIcon(Mat matImage, Mat heartIcon, int gap) {
+//        // Ensure heart icon has an alpha channel (transparency)
+//        if (heartIcon.channels() < 4) {
+//            Imgproc.cvtColor(heartIcon, heartIcon, Imgproc.COLOR_BGR2BGRA);
+//        }
+//
+//        // Resize the heart icon to fit the desired size
+//        int heartWidth = heartIcon.width();
+//        int heartHeight = heartIcon.height();
+//        int maxWidth = matImage.width() / 5; // Adjust the size of the heart icon (20% of the image width)
+//        int maxHeight = matImage.height() / 5; // Adjust the size of the heart icon (20% of the image height)
+//
+//        if (heartWidth > maxWidth || heartHeight > maxHeight) {
+//            double aspectRatio = (double) heartWidth / heartHeight;
+//            if (heartWidth > heartHeight) {
+//                heartWidth = maxWidth;
+//                heartHeight = (int) (maxWidth / aspectRatio);
+//            } else {
+//                heartHeight = maxHeight;
+//                heartWidth = (int) (maxHeight * aspectRatio);
+//            }
+//            Size newSize = new Size(heartWidth, heartHeight);
+//            Imgproc.resize(heartIcon, heartIcon, newSize);
+//        }
+//
+//        // Position to place the heart icon
+//        int xPos = matImage.width() - heartIcon.width() - gap;
+//        int yPos = gap;
+//
+//        // Overlay the heart icon
+//        for (int y = 0; y < heartIcon.height(); y++) {
+//            for (int x = 0; x < heartIcon.width(); x++) {
+//                double[] heartPixel = heartIcon.get(y, x);
+//                double[] imagePixel = matImage.get(yPos + y, xPos + x);
+//
+//                if (heartPixel.length == 4 && heartPixel[3] != 0) { // Check if the pixel is not fully transparent
+//                    double alpha = heartPixel[3] / 255.0;
+//                    double inverseAlpha = 1.0 - alpha;
+//
+//                    // Blend the heart icon pixel with the image pixel
+//                    double[] blendedPixel = new double[3];
+//                    for (int i = 0; i < 3; i++) {
+//                        blendedPixel[i] = heartPixel[i] * alpha + imagePixel[i] * inverseAlpha;
+//                    }
+//                    matImage.put(yPos + y, xPos + x, blendedPixel);
+//                }
+//            }
+//        }
+//
+//        return matImage;
+//    }
 
 
     /**
