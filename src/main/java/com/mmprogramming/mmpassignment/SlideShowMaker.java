@@ -22,8 +22,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 
-import javax.imageio.stream.FileImageInputStream;
-import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +65,8 @@ public class SlideShowMaker extends Application {
     @Override
     public void start(Stage primaryStage) {
 
+        primaryStage.setResizable(false);
+
         // Load images from the folder
         // Folder path containing images
         String folderPath = "src/main/resources/com/mmprogramming/mmpassignment/square_image";
@@ -77,8 +77,8 @@ public class SlideShowMaker extends Application {
         VBox root = new VBox();
 
         imageView = new ImageView();
-        imageView.setFitHeight(400);
-        imageView.setFitWidth(600);
+        imageView.setFitHeight(450);
+        imageView.setFitWidth(450   );
 
         imageView.fitWidthProperty().bind(primaryStage.widthProperty());
 //        imageView.fitHeightProperty().bind(primaryStage.heightProperty().subtract(100));
