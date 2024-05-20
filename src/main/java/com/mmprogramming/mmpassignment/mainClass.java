@@ -137,32 +137,12 @@ public class mainClass extends Application {
         upload_button.setOnAction(event -> {
             if (isSelectMode) {
                 // Create a slideshow
-                List<Integer> selectedImageIds = new ArrayList<>();
+                List<Image> selectedImage = new ArrayList<>();
                 for (ImageView imageView : selectedImages) {
-                    String path = imageView.getImage().getUrl();
-
-                    // start at src
-                    int srcIndex = path.indexOf("src");
-                    if (srcIndex != -1) {
-                        path = path.substring(srcIndex);
-                    }
-
-                    // Normalize path to use forward slashes
-                    path = path.replace("\\", "/");
-
-                    System.out.println("Generated Path: " + path);
-
-                    // Get ID of selected image
-                    int id = DBHelper.getImageID(path);
-
-                    System.out.println("Retrieved ID: " + id);
-
-                    // Add ID to a list
-                    selectedImageIds.add(id);
+                    Image image = imageView.getImage();
+                    selectedImage.add(image);
                 }
-
-
-                createSlideshow(selectedImageIds);
+                createSlideshow(primaryStage, selectedImage);
             } else {
                 // Upload an image
                 uploadImage(primaryStage);
@@ -272,9 +252,19 @@ public class mainClass extends Application {
         selectedImages.clear();
     }
 
-    private void createSlideshow(List<Integer> selectedImageIds) {
+    private void createSlideshow(Stage primaryStage, List<Image> selectedImage) {
         // Logic to create slideshow with selected image IDs
-        System.out.println("Creating slideshow with IDs: " + selectedImageIds);
+        // Create an instance of UploadPage and pass selectedFile to its constructor
+        SlideShowMaker slideShowMaker = new SlideShowMaker(selectedImage);
+
+        // Create a new stage for UploadPage
+        Stage slideShowMakerStage = new Stage();
+
+        // Call the start method of UploadPage, passing the new stage
+        slideShowMaker.start(slideShowMakerStage);
+
+        // Close the primaryStage (optional)
+        primaryStage.close();
         // Implement slideshow creation logic here
     }
 

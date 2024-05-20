@@ -52,7 +52,6 @@ public class EditNewImage extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-
         // Create the database if it doesn't exist
         DBHelper.createDatabase();
 

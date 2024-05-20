@@ -21,26 +21,26 @@ import javafx.util.Duration;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.List;
 
 public class SlideShowMaker extends Application {
     private int currentIndex = 0;
     private ImageView imageView;
     private MediaPlayer mediaPlayer;
+    private List<Image> imageList;
 
-    // List of image URLs or paths
-    private final String[] imagePaths = {
-            "C:\\Users\\serve\\Downloads\\ImagesForTesting\\1.jpg",
-            "C:\\Users\\serve\\Downloads\\ImagesForTesting\\2.png",
-            "C:\\Users\\serve\\Downloads\\ImagesForTesting\\3.jpg"
-    };
+
+    public SlideShowMaker(List<Image> imageList) {
+        this.imageList = imageList;
+    }
 
     @Override
     public void start(Stage primaryStage) {
         VBox root = new VBox();
 
         imageView = new ImageView();
-        imageView.setFitHeight(400);
-        imageView.setFitWidth(600);
+        imageView.setFitHeight(540);
+        imageView.setFitWidth(960);
 
         imageView.fitWidthProperty().bind(primaryStage.widthProperty());
         imageView.fitHeightProperty().bind(primaryStage.heightProperty().subtract(80));
@@ -55,18 +55,19 @@ public class SlideShowMaker extends Application {
         buttonBar.setAlignment(Pos.CENTER);
         buttonBar.setPadding(new Insets(20));
 
+        Button backButton = new Button("Back");
         Button playButton = new Button("Play Video");
         Button pauseButton = new Button("Pause");
         Button chooseSoundFile = new Button("Choose Sound File");
         Button addGraphics = new Button("Add Graphics");
         Button addText = new Button("Add Text");
 
-        buttonBar.getChildren().addAll(playButton, pauseButton, chooseSoundFile, addText, addGraphics);
+        buttonBar.getChildren().addAll(backButton, playButton, pauseButton, chooseSoundFile, addText, addGraphics);
 
         updateImage();
 
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), event -> {
-            currentIndex = (currentIndex + 1) % imagePaths.length;
+            currentIndex = (currentIndex + 1) % imageList.size();
             updateImage();
         }));
         timeline.setCycleCount(Timeline.INDEFINITE);
@@ -103,6 +104,13 @@ public class SlideShowMaker extends Application {
             }
         });
 
+        backButton.setOnAction(actionEvent -> {
+            Stage stage = (Stage) backButton.getScene().getWindow();
+            stage.close();
+            mainClass main = new mainClass();
+            main.start(new Stage());
+        });
+
         root.getChildren().addAll(imageView, buttonBar);
         Scene scene = new Scene(root, 800, 600);
 
@@ -118,10 +126,9 @@ public class SlideShowMaker extends Application {
         ft.setFromValue(0);
         ft.setToValue(1);
         ft.play();
-        try {
-            Image image = new Image(new FileInputStream(imagePaths[currentIndex]));
-            imageView.setImage(image);
-        } catch (FileNotFoundException e) {}
+        Image image = imageList.get(currentIndex);
+        imageView.setImage(image);
+
     }
 
     // Method to show image selection dialog
@@ -139,14 +146,14 @@ public class SlideShowMaker extends Application {
 
         ToggleGroup toggleGroup = new ToggleGroup();
 
-        for (int i = 0; i < imagePaths.length; i++) {
+        for (int i = 0; i < imageList.size(); i++) {
             RadioButton radioButton = new RadioButton("Image " + (i + 1));
             radioButton.setToggleGroup(toggleGroup);
             radioButton.setUserData(i);
             grid.add(radioButton, 0, i);
         }
 
-        if (imagePaths.length > 0) {
+        if (imageList.size() > 0) {
             ((RadioButton) toggleGroup.getToggles().get(0)).setSelected(true);
         }
 
@@ -174,8 +181,5 @@ public class SlideShowMaker extends Application {
 //
 //    }
 
-    public static void main(String[] args) {
-        launch(args);
-    }
 }
 
