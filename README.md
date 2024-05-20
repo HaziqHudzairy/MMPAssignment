@@ -222,7 +222,32 @@ Captions stored in the database are fetched and displayed in the UI.
   - Build the logic to dynamically navigate to each image.
 
 # Description of Functions and Outputs
-| Syntax | Description |
+
+## DBHelper Class Functions
+| Function | Description |
+|----------|-------------|
+| `createDatabase` | Creates the SQLite database and initializes the `ImageData` table if it does not exist. |
+| `createTable` | Creates the `ImageData` table if it does not exist. Takes a `Connection` object as a parameter. |
+| `addData` | Adds a new record to the `ImageData` table. Parameters include the image file path, star flag, text, text color, and square file path. |
+| `removeData` | Removes a record from the `ImageData` table by ID. Takes an integer `id` as a parameter. |
+| `getSquarePaths` | Retrieves a list of all square file paths from the `ImageData` table. Returns a list of strings. |
+| `getStarValue` | Retrieves the star value of the image record by square file path. Takes a string `squareFilePath` as a parameter and returns a boolean. |
+| `getOriginalImage` | Retrieves the original image file path by square file path. Takes a string `squareFilePath` as a parameter and returns a string. |
+| `handleSQLException` | Handles and prints details of SQL exceptions. Takes a `SQLException` object as a parameter. |
+
+## mainClass Functions
+| Function | Description |
+|----------|-------------|
+| `start` | Initializes the primary stage and sets up the main application layout. Calls `DBHelper.createDatabase()` to initialize the database. |
+| `layout` | Sets up the user interface layout, including background image, buttons, and photo grid. Handles button actions for selecting and uploading images. Returns a `StackPane` as the root node. |
+| `uploadImage` | Opens a file chooser dialog to upload an image. If an image is selected, it launches the `EditNewImage` stage. Takes `Stage` as a parameter. |
+| `handleImageClick` | Handles the event when an image is clicked. Closes the primary stage and opens the `ImageViewer` stage with the clicked image. Takes `Stage` and `String` imagePath as parameters. |
+| `displayImages` | Retrieves image paths from the database and displays them in a `FlowPane`. Handles image click events for selecting and viewing images. Takes `Stage` and `FlowPane` as parameters. |
+| `clearSelection` | Clears the selection of images, removing any highlights. Takes `FlowPane` as a parameter. |
+| `createSlideshow` | Creates a slideshow from the selected images and launches the `SlideShowMaker` stage. Takes `Stage` and a list of `Image` objects as parameters. |
+
+## EditNewImage Functions
+| Method | Description |
 | ----------- | ----------- |
 | `EditNewImage(File selectedFile)`   | Constructor method that initializes an instance of the `EditNewImage` class with a selected file. |
 | `start(Stage primaryStage)`         | Method that initializes and displays the GUI components for editing images.                   |
@@ -237,11 +262,4 @@ Captions stored in the database are fetched and displayed in the UI.
 | `start(Stage primaryStage)`                              | Method that initializes and displays the GUI components for creating a slideshow.                |
 | `updateImage()`                                          | Method that updates the image in the `ImageView`.                                                |
 | `showTextInputDialog()`                                  | Method that displays a dialog for editing the text of the current slide.                          |
-| `addGraphics()`                                          | Method that displays a dialog for selecting a graphic to add to the slide.  
-| `layout(Stage primaryStage)`                              | Method that creates and configures the layout for the application.                               |
-| `uploadImage(Stage primaryStage)`                         | Method that handles the functionality to upload an image.                                         |
-| `handleImageClick(String imagePath)`                      | Method that handles the click event for an image.                                                 |
-| `displayImages(FlowPane photo_grid)`                      | Method that displays images fetched from the database in the photo grid.                           |
-| `clearSelection(FlowPane photoGrid)`                      | Method that clears the selection of images in the photo grid.                                      |
-| `createSlideshow(Stage primaryStage, List<Image> selectedImage)` | Method that creates a slideshow with selected images.                                         |
-| `main(String[] args)`| Main method that launches the application.     
+| `addGraphics()`                                          | Method that displays a dialog for selecting a graphic to add to the slide.                        |
