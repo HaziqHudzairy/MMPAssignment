@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DdlMappings">
+    <mapping uuid="5385498c-2d82-452e-bddc-d988fdde0d96" name="ImageEditor.db Mapping">
+      <data-sources db="565ee5fa-3023-4ba1-956c-301ffd9fbf7a" />
+      <scope>
+        <node negative="1">
+          <node kind="database" negative="1" />
+          <node kind="schema" qname="main" />
+        </node>
+      </scope>
+    </mapping>
+  </component>
+</project>
