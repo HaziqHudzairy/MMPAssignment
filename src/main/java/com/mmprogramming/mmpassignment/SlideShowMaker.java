@@ -22,6 +22,8 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 
+import javax.imageio.stream.FileImageInputStream;
+import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,8 +67,6 @@ public class SlideShowMaker extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-        primaryStage.setResizable(false);
-
         // Load images from the folder
         // Folder path containing images
         String folderPath = "src/main/resources/com/mmprogramming/mmpassignment/square_image";
@@ -77,8 +77,8 @@ public class SlideShowMaker extends Application {
         VBox root = new VBox();
 
         imageView = new ImageView();
-        imageView.setFitHeight(450);
-        imageView.setFitWidth(450   );
+        imageView.setFitHeight(400);
+        imageView.setFitWidth(600);
 
         imageView.fitWidthProperty().bind(primaryStage.widthProperty());
 //        imageView.fitHeightProperty().bind(primaryStage.heightProperty().subtract(100));
@@ -287,16 +287,30 @@ public class SlideShowMaker extends Application {
         grid.setVgap(10);
         grid.setPadding(new Insets(20, 150, 10, 10));
 
-        File graphicsFolder = new File("src/main/resources/com/mmprogramming/mmpassignment/resource_image/graphics");
+        File graphicsFolder = new File("src/main/resources/com/mmprogramming/mmpassignment/graphics");
         File[] graphicFiles = graphicsFolder.listFiles((dir, name) -> name.toLowerCase().endsWith(".png") || name.toLowerCase().endsWith(".jpg"));
 
         ToggleGroup toggleGroup = new ToggleGroup();
 
         if (graphicFiles != null) {
             for (int i = 0; i < graphicFiles.length; i++) {
-                RadioButton radioButton = new RadioButton(graphicFiles[i].getName());
+                File graphicFile = graphicFiles[i];
+                Image image = new Image(graphicFile.toURI().toString());
+                ImageView imageView = new ImageView(image);
+
+                // Resize the image to the desired size
+                imageView.setFitWidth(50);
+                imageView.setFitHeight(50);
+                imageView.setPreserveRatio(true);
+
+                HBox hBox = new HBox(imageView);
+                hBox.setAlignment(Pos.CENTER);
+
+                RadioButton radioButton = new RadioButton();
+                radioButton.setGraphic(imageView);
                 radioButton.setToggleGroup(toggleGroup);
-                radioButton.setUserData(graphicFiles[i].getAbsolutePath());
+                radioButton.setUserData(graphicFile.getAbsolutePath());
+
                 grid.add(radioButton, 0, i);
             }
 
