@@ -253,8 +253,6 @@ public class mainClass extends Application {
     }
 
     private void createSlideshow(Stage primaryStage, List<Image> selectedImage) {
-        // Logic to create slideshow with selected image IDs
-        // Create an instance of UploadPage and pass selectedFile to its constructor
         SlideShowMaker slideShowMaker = new SlideShowMaker(selectedImage);
 
         // Create a new stage for UploadPage
