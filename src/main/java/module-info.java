@@ -5,6 +5,7 @@ module com.mmprogramming.mmpassignment {
     requires opencv;
     requires javafx.media;
     requires java.desktop;
+    requires javafx.swing;
 
 
     opens com.mmprogramming.mmpassignment to javafx.fxml;

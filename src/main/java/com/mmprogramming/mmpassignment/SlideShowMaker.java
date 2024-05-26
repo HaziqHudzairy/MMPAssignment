@@ -4,6 +4,7 @@ import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -20,60 +21,45 @@ import javafx.scene.media.MediaPlayer;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.opencv.core.*;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
 
-
+import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class SlideShowMaker extends Application {
     private int currentIndex = 0;
-    private Label textLabel;
     private ImageView imageView;
+    private StackPane stackPane;
     private MediaPlayer mediaPlayer;
-    private List<ImageView> graphicsList = new ArrayList<>(); // List to store graphic elements
     private List<Image> imageList;
-
-    // List to store image texts
-    private final List<String> imageTexts = new ArrayList<>();
-    private final String captionFilePath = "captions.txt";
-
 
     public SlideShowMaker(List<Image> imageList) {
         this.imageList = imageList;
     }
 
-
-
     @Override
     public void start(Stage primaryStage) {
-
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         // Load images from the folder
         // Folder path containing images
         String folderPath = "src/main/resources/com/mmprogramming/mmpassignment/square_image";
-        loadCaptionsFromFile(captionFilePath);
-
 
         VBox root = new VBox();
 
+        stackPane = new StackPane();
+        stackPane.setMaxHeight(400);
+        stackPane.setMaxWidth(400);
+
         imageView = new ImageView();
         imageView.setFitHeight(400);
-        imageView.setFitWidth(600);
-
-        imageView.fitWidthProperty().bind(primaryStage.widthProperty());
-//        imageView.fitHeightProperty().bind(primaryStage.heightProperty().subtract(100));
-
-        VBox.setVgrow(imageView, Priority.ALWAYS);
+        imageView.setFitWidth(400);
 
         root.setAlignment(Pos.CENTER);
-
         imageView.setPreserveRatio(true);
-
-        textLabel = new Label();
-        textLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: black;");
-        textLabel.setPadding(new Insets(10));
-        VBox.setVgrow(textLabel, Priority.NEVER);
+        stackPane.getChildren().add(imageView);
 
         HBox buttonBar = new HBox(10);
         buttonBar.setAlignment(Pos.CENTER);
@@ -123,14 +109,13 @@ public class SlideShowMaker extends Application {
             }
         });
 
-
         //add addText button
         addText.setOnAction(actionEvent -> showTextInputDialog());
 
         //add addGraphics
         addGraphics.setOnAction(actionEvent -> addGraphics());
 
-        root.getChildren().addAll(imageView, textLabel, buttonBar);
+        root.getChildren().addAll(stackPane, buttonBar);
         Scene scene = new Scene(root, 800, 600);
 
         // Set up the stage
@@ -139,48 +124,18 @@ public class SlideShowMaker extends Application {
         primaryStage.show();
     }
 
-
-    // Method to load captions from a text file
-    private void loadCaptionsFromFile(String filePath) {
-        try (Scanner scanner = new Scanner(new File(filePath))) {
-            int i = 0;
-            while (scanner.hasNextLine()) {
-                if (i < imageTexts.size()) {
-                    imageTexts.set(i, scanner.nextLine());
-                } else {
-                    imageTexts.add(scanner.nextLine());
-                }
-                i++;
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // Method to save captions to a text file
-    private void saveCaptionsToFile(String filePath) {
-        try (PrintWriter writer = new PrintWriter(new FileWriter(filePath))) {
-            for (String text : imageTexts) {
-                writer.println(text);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     // Method to update the image in the ImageView
     private void updateImage() {
         FadeTransition ft = new FadeTransition(Duration.seconds(1), imageView);
         ft.setFromValue(0);
         ft.setToValue(1);
         ft.play();
-            Image image = imageList.get(currentIndex);
-            imageView.setImage(image);
-            textLabel.setText(imageTexts.get(currentIndex)); // update the image text
+        Image image = imageList.get(currentIndex);
+        imageView.setImage(image);
     }
 
     private void addGraphics() {
-        Dialog<String> dialog = new Dialog<>();
+        Dialog<Image> dialog = new Dialog<>();
         dialog.setTitle("Select a Graphic");
 
         ButtonType confirmButtonType = new ButtonType("Confirm", ButtonBar.ButtonData.OK_DONE);
@@ -213,7 +168,7 @@ public class SlideShowMaker extends Application {
                 RadioButton radioButton = new RadioButton();
                 radioButton.setGraphic(imageView);
                 radioButton.setToggleGroup(toggleGroup);
-                radioButton.setUserData(graphicFile.getAbsolutePath());
+                radioButton.setUserData(image);
 
                 grid.add(radioButton, 0, i);
             }
@@ -227,16 +182,73 @@ public class SlideShowMaker extends Application {
 
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == confirmButtonType) {
-                return (String) toggleGroup.getSelectedToggle().getUserData();
+                RadioButton selectedImage = (RadioButton) toggleGroup.getSelectedToggle();
+                return (Image) selectedImage.getUserData();
             }
             return null;
         });
 
         dialog.showAndWait().ifPresent(result -> {
-            System.out.println("Selected graphic: " + result);
+            Pos position = showPositionDialog();
+            if (position != null) {
+                ImageView imageView = new ImageView(result);
+                imageView.setFitWidth(50);
+                imageView.setFitHeight(50);
+                imageView.setPreserveRatio(true);
+
+                stackPane.getChildren().add(imageView);
+                StackPane.setAlignment(imageView, position);
+            }
         });
     }
 
+    private Pos showPositionDialog() {
+        Dialog<Pos> positionDialog = new Dialog<>();
+        positionDialog.setTitle("Select Position");
+
+        ButtonType confirmButtonType = new ButtonType("Confirm", ButtonBar.ButtonData.OK_DONE);
+        positionDialog.getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        ToggleGroup positionGroup = new ToggleGroup();
+
+        RadioButton topLeft = new RadioButton("Top Left");
+        topLeft.setToggleGroup(positionGroup);
+        topLeft.setUserData(Pos.TOP_LEFT);
+
+        RadioButton topRight = new RadioButton("Top Right");
+        topRight.setToggleGroup(positionGroup);
+        topRight.setUserData(Pos.TOP_RIGHT);
+
+        RadioButton bottomLeft = new RadioButton("Bottom Left");
+        bottomLeft.setToggleGroup(positionGroup);
+        bottomLeft.setUserData(Pos.BOTTOM_LEFT);
+
+        RadioButton bottomRight = new RadioButton("Bottom Right");
+        bottomRight.setToggleGroup(positionGroup);
+        bottomRight.setUserData(Pos.BOTTOM_RIGHT);
+
+        grid.add(topLeft, 0, 0);
+        grid.add(topRight, 1, 0);
+        grid.add(bottomLeft, 0, 1);
+        grid.add(bottomRight, 1, 1);
+
+        positionDialog.getDialogPane().setContent(grid);
+
+        positionDialog.setResultConverter(dialogButton -> {
+            if (dialogButton == confirmButtonType) {
+                RadioButton selectedPosition = (RadioButton) positionGroup.getSelectedToggle();
+                return (Pos) selectedPosition.getUserData();
+            }
+            return null;
+        });
+
+        return positionDialog.showAndWait().orElse(null);
+    }
 
     private void showTextInputDialog() {
         Dialog<String> dialog = new Dialog<>();
@@ -249,7 +261,6 @@ public class SlideShowMaker extends Application {
 
         // Create the text field and set it with the current slide text.
         TextField textField = new TextField();
-        textField.setText(imageTexts.get(currentIndex));
 
         // Layout for the dialog.
         GridPane grid = new GridPane();
@@ -271,14 +282,82 @@ public class SlideShowMaker extends Application {
         });
 
         dialog.showAndWait().ifPresent(result -> {
-            imageTexts.set(currentIndex, result);
-            textLabel.setText(result); // Update label
-            saveCaptionsToFile(captionFilePath); // Save the updated captions to the file
+            Mat currentImage = image2Mat(imageList.get(currentIndex));
+            Imgproc.putText (
+                    currentImage,                          // Matrix obj of the image
+                    result,          // Text to be added
+                    new Point(10, 50),               // point
+                    Imgproc.FONT_HERSHEY_PLAIN ,      // front face
+                    1,                               // front scale
+                    new Scalar(0, 0, 0),             // Scalar object for color
+                    4                                // Thickness
+            );
+            imageList.set(currentIndex, Mat2Image(currentImage));
+            updateImage();
         });
     }
 
-    public static void main(String[] args) {
-        launch(args);
+    public static Mat image2Mat(Image image) {
+        BufferedImage bImage = SwingFXUtils.fromFXImage(image, null);
+        return bufferedImage2Mat(bImage);
     }
+
+    public static Mat bufferedImage2Mat(BufferedImage in) {
+        Mat out; // The output matrix that will be returned
+        byte[] data; // Array to hold the image data
+        int r, g, b; // Variables to hold the red, green, and blue components of the image
+        int height = in.getHeight(); // Height of the input BufferedImage
+        int width = in.getWidth(); // Width of the input BufferedImage
+
+        // Check if the image type is RGB or ARGB
+        if (in.getType() == BufferedImage.TYPE_INT_RGB || in.getType() == BufferedImage.TYPE_INT_ARGB) {
+            // Create a 3-channel Mat (CV_8UC3) for RGB images
+            out = new Mat(height, width, CvType.CV_8UC3);
+            // Initialize the data array to hold the image data
+            data = new byte[height * width * (int) out.elemSize()];
+            // Get the image's RGB data
+            int[] dataBuff = in.getRGB(0, 0, width, height, null, 0, width);
+            // Loop through each pixel and extract RGB values
+            for (int i = 0; i < dataBuff.length; i++) {
+                // Blue component
+                data[i * 3 + 2] = (byte) ((dataBuff[i] >> 16) & 0xFF);
+                // Green component
+                data[i * 3 + 1] = (byte) ((dataBuff[i] >> 8) & 0xFF);
+                // Red component
+                data[i * 3] = (byte) ((dataBuff[i] >> 0) & 0xFF);
+            }
+        } else {
+            // Create a 1-channel Mat (CV_8UC1) for grayscale images
+            out = new Mat(height, width, CvType.CV_8UC1);
+            // Initialize the data array to hold the image data
+            data = new byte[height * width * (int) out.elemSize()];
+            // Get the image's RGB data
+            int[] dataBuff = in.getRGB(0, 0, width, height, null, 0, width);
+            // Loop through each pixel and convert to grayscale
+            for (int i = 0; i < dataBuff.length; i++) {
+                // Extract the red, green, and blue components
+                r = (byte) ((dataBuff[i] >> 16) & 0xFF);
+                g = (byte) ((dataBuff[i] >> 8) & 0xFF);
+                b = (byte) ((dataBuff[i] >> 0) & 0xFF);
+                // Calculate the grayscale value using the luminosity method
+                data[i] = (byte) ((0.21 * r) + (0.71 * g) + (0.07 * b));
+            }
+        }
+        // Put the image data into the Mat object
+        out.put(0, 0, data);
+        // Return the Mat object
+        return out;
+    }
+
+    public static Image Mat2Image(Mat frame) {
+        // create a temporary buffer
+        MatOfByte buffer = new MatOfByte();
+        // encode the frame in the buffer, according to the PNG format
+        Imgcodecs.imencode(".png", frame, buffer);
+        // build and return an Image created from the image encoded in the
+        // buffer
+        return new Image(new ByteArrayInputStream(buffer.toArray()));
+    }
+
 }
 
