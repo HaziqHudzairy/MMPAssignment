@@ -3,6 +3,7 @@
 - Java SDK 21
 - JavaFX SDK 21
 - JavaFX Media Package (installed from Maven repository)
+- JavaFX Swing Package (installed from Maven repository)
 - [OpenCV 4.9.0](https://opencv.org/releases/)
 - [SQLite JDBC Driver](https://github.com/xerial/sqlite-jdbc)
 
