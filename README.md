@@ -86,8 +86,16 @@ As a user, you will not have to worry about security as no personal data is shar
 | `adjustBrightness(Mat image, double factor)` | Method that adjusts the brightness of the input image.                                      |
 | `convertToGrayscale(Mat inputImage)` | Method that converts the input image to grayscale.                                             |
 | `applyGaussianBlur(Mat image, double radius)` | Method that applies Gaussian blur to the input image.                                       |
-| `SlideShowMaker(List<Image> imageList)`                  | Constructor method that initializes an instance of the `SlideShowMaker` class with a list of images. |
-| `start(Stage primaryStage)`                              | Method that initializes and displays the GUI components for creating a slideshow.                |
-| `updateImage()`                                          | Method that updates the image in the `ImageView`.                                                |
-| `showTextInputDialog()`                                  | Method that displays a dialog for editing the text of the current slide.                          |
-| `addGraphics()`                                          | Method that displays a dialog for selecting a graphic to add to the slide.                        |
+
+## SlideShowMaker Functions
+| Method | Description |
+| ----------- | ----------- |
+| `SlideShowMaker(List<Image> imageList)` | Constructor that initializes the `SlideShowMaker` with a list of images. |
+| `start(Stage primaryStage)` | Sets up the primary stage, initializes the UI components, and configures the slideshow and media controls. |
+| `updateImage()` | Updates the current image in the `ImageView` with a fade transition. |
+| `addGraphics()` | Opens a dialog to select and position a graphic to be added to the current slide. |
+| `showPositionDialog()` | Opens a dialog to select the position for placing the graphic on the slide. |
+| `showTextInputDialog()` | Opens a dialog to input text and overlays it on the current slide. |
+| `image2Mat(Image image)` | Converts a JavaFX `Image` to an OpenCV `Mat`. |
+| `bufferedImage2Mat(BufferedImage in)` | Converts a `BufferedImage` to an OpenCV `Mat`. |
+| `Mat2Image(Mat frame)` | Converts an OpenCV `Mat` to a JavaFX `Image`. |
