@@ -88,14 +88,23 @@ As a user, you will not have to worry about security as no personal data is shar
 | `applyGaussianBlur(Mat image, double radius)` | Method that applies Gaussian blur to the input image.                                       |
 
 ## SlideShowMaker Functions
-| Method | Description |
-| ----------- | ----------- |
-| `SlideShowMaker(List<Image> imageList)` | Constructor that initializes the `SlideShowMaker` with a list of images. |
-| `start(Stage primaryStage)` | Sets up the primary stage, initializes the UI components, and configures the slideshow and media controls. |
-| `updateImage()` | Updates the current image in the `ImageView` with a fade transition. |
-| `addGraphics()` | Opens a dialog to select and position a graphic to be added to the current slide. |
-| `showPositionDialog()` | Opens a dialog to select the position for placing the graphic on the slide. |
-| `showTextInputDialog()` | Opens a dialog to input text and overlays it on the current slide. |
-| `image2Mat(Image image)` | Converts a JavaFX `Image` to an OpenCV `Mat`. |
-| `bufferedImage2Mat(BufferedImage in)` | Converts a `BufferedImage` to an OpenCV `Mat`. |
-| `Mat2Image(Mat frame)` | Converts an OpenCV `Mat` to a JavaFX `Image`. |
+| Method                                      | Description |
+|---------------------------------------------|-------------|
+| `updateImage()`                             | Updates the image in the `ImageView` and adds a fade transition effect. |
+| `addGraphics()`                             | Opens a dialog to select a graphic image, allows the user to choose a position, and adds the selected graphic to the `StackPane`. |
+| `showPositionDialog()`                      | Opens a dialog for the user to select the position of the graphic on the image. Returns the selected position as a `Pos` object. |
+| `showTextInputDialog()`                     | Opens a dialog to edit the text caption for the current slide. Updates the image with the new caption text. |
+| `image2Mat(Image image)`                    | Converts a JavaFX `Image` to an OpenCV `Mat` object. |
+| `bufferedImage2Mat(BufferedImage in)`       | Converts a `BufferedImage` to an OpenCV `Mat` object, handling both RGB and grayscale images. |
+| `Mat2Image(Mat frame)`                      | Converts an OpenCV `Mat` object to a JavaFX `Image`. |
+
+## ImageViewer Functions
+| Method                           | Description |
+|----------------------------------|-------------|
+| `ImageViewer(int ID)`            | Constructor that initializes the `imageID` with the provided ID. |
+| `start(Stage primaryStage)`      | The main entry point for the JavaFX application. Sets up the UI components, loads the image, sets up event handlers for buttons, and fetches/display captions from the database. |
+| `addCaption(ActionEvent event)`  | Creates a TextField for entering captions and a save button. When the save button is clicked, the caption is saved to the database and the displayed captions are updated. |
+| `saveCaptionToDatabase(String caption)` | Inserts the provided caption into the database. |
+| `displayCaptionsFromDatabase()`  | Fetches captions from the database and displays them in the `captionDisplayBox`. |
+| `styleButton(Button button)`     | Sets the preferred width and height for a button to ensure consistent styling. |
+
