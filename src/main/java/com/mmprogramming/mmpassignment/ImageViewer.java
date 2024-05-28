@@ -140,7 +140,7 @@ public class ImageViewer extends Application {
 
     // Method to save caption to the database
     private void saveCaptionToDatabase(String caption) {
-        String insertSQL = "INSERT INTO captions (caption) VALUES (?)";
+        String insertSQL = "INSERT INTO ImageEditors (caption) VALUES (?)";
 
         try (Connection conn = DriverManager.getConnection(DATABASE_URL);
              PreparedStatement pstmt = conn.prepareStatement(insertSQL)) {
@@ -157,7 +157,7 @@ public class ImageViewer extends Application {
     private void displayCaptionsFromDatabase() {
         captionDisplayBox.getChildren().clear(); // Clear existing captions
 
-        String selectSQL = "SELECT caption FROM captions";
+        String selectSQL = "SELECT caption FROM ImageEditor";
 
         try (Connection conn = DriverManager.getConnection(DATABASE_URL);
              Statement stmt = conn.createStatement();
